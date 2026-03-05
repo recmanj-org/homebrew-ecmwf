@@ -1,8 +1,9 @@
 class EcmwfToolbox < Formula
   desc "ECMWF monolithic bundle: eckit, eccodes, atlas, odc, magics, and more"
   homepage "https://github.com/ecmwf/ecmwf-toolbox"
-  url "https://github.com/ecmwf/ecmwf-toolbox/archive/refs/tags/2026.01.0.0.tar.gz"
-  sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+  url "https://github.com/ecmwf/ecbundle/archive/refs/tags/2.4.0.tar.gz"
+  version "2026.01.0.0"
+  sha256 "542da932b6884383690b3ea144e3ec0f88f466364bec0422be11e6ea2faf457b"
   license "Apache-2.0"
 
   livecheck do
@@ -12,6 +13,7 @@ class EcmwfToolbox < Formula
 
   depends_on "cmake" => :build
   depends_on "ecbuild" => :build
+  depends_on "ecbundle" => :build
   depends_on "cairo"
   depends_on "gcc" # Fortran
   depends_on "lapack"
@@ -35,8 +37,8 @@ class EcmwfToolbox < Formula
   conflicts_with "recmanj-org/ecmwf/odc", because: "ecmwf-toolbox includes odc"
 
   resource "eckit" do
-    url "https://github.com/ecmwf/eckit/archive/refs/tags/1.32.4.tar.gz"
-    sha256 "8b2752016b4765c697c2ff85dda39366c9a8fdc798f6418565437759a8cbfed5"
+    url "https://github.com/ecmwf/eckit/archive/refs/tags/1.33.1.tar.gz"
+    sha256 "89878eb491fbc22c99b88f5b2a1521e1e3fe4b3779b0254ce3e11929a48cea74"
   end
 
   resource "eccodes" do
@@ -80,102 +82,74 @@ class EcmwfToolbox < Formula
   end
 
   def install
-    # Stage each sub-project resource into source/<name>/
-    srcdir = buildpath/"source"
+    # Stage each resource into staging/<project-name>/
+    stagedir = buildpath/"staging"
     %w[eckit eccodes odc metkit atlas atlas-orca mir magics].each do |proj|
-      resource(proj).stage(srcdir/proj)
+      resource(proj).stage(stagedir/proj)
     end
-    # fdb repo maps to the fdb5 project name in the bundle
-    resource("fdb").stage(srcdir/"fdb5")
+    resource("fdb").stage(stagedir/"fdb5")
 
-    # Generate the CMakeLists.txt that ecbundle would normally create
-    (srcdir/"CMakeLists.txt").write <<~CMAKE
-      cmake_minimum_required( VERSION 3.12 FATAL_ERROR )
+    # Generate bundle.yml with dir: entries (no git cloning needed)
+    (buildpath/"bundle.yml").write <<~YAML
+      ---
+      name: ecmwf-toolbox
+      version: #{version}
 
-      ####################################################################
+      projects:
+        - eckit:
+            dir: #{stagedir}/eckit
+            cmake: ECKIT_ENABLE_ECKIT_GEO=ON
+        - eccodes:
+            dir: #{stagedir}/eccodes
+            cmake: >
+              ECCODES_ENABLE_ECCODES_THREADS=ON
+              ECCODES_INSTALL_EXTRA_TOOLS=ON
+              ECCODES_ENABLE_MEMFS=ON
+              ECCODES_ENABLE_FORTRAN=ON
+              ECCODES_ENABLE_ECKIT_GEO=OFF
+        - odc:
+            dir: #{stagedir}/odc
+            require: eckit
+            cmake: ODC_ENABLE_FORTRAN=ON
+        - metkit:
+            dir: #{stagedir}/metkit
+            require: eccodes eckit odc
+            cmake: METKIT_ENABLE_BUILD_TOOLS=OFF
+        - atlas:
+            dir: #{stagedir}/atlas
+            require: eckit
+        - atlas-orca:
+            dir: #{stagedir}/atlas-orca
+            require: atlas
+        - mir:
+            dir: #{stagedir}/mir
+            require: eccodes eckit atlas
+            cmake: >
+              MIR_ENABLE_BUILD_TOOLS=ON
+              MIR_ENABLE_ECKIT_GEO=ON
+        - magics:
+            dir: #{stagedir}/magics
+            require: eccodes odc
+            cmake: MAGICS_ENABLE_ODB=ON
+        - fdb5:
+            dir: #{stagedir}/fdb5
+            require: eccodes eckit metkit
+            cmake: FDB5_ENABLE_BUILD_TOOLS=OFF
+    YAML
 
-      macro( ecbundle_add_project package_name )
-          set( BUILD_${package_name} ON CACHE BOOL "" )
-          if( BUILD_${package_name} )
-              set( dir ${ARGV1} )
-              if( NOT dir )
-                  set( dir ${package_name} )
-              endif()
-              add_subdirectory( ${dir} )
-          endif()
-      endmacro()
+    # ecbundle create — reads bundle.yml, generates source/CMakeLists.txt with symlinks
+    system "ecbundle", "create", "--bundle", buildpath.to_s
 
-      macro( ecbundle_set key value )
-          set( ${key} ${value} CACHE STRING "" )
-          if( "${${key}}" STREQUAL "${value}" )
-             message("  - ${key} = ${value}" )
-          else()
-             message("  - ${key} = ${${key}} [default=${value}]" )
-          endif()
-      endmacro()
-
-      ####################################################################
-
-      message( "" )
-      message( "ecmwf-toolbox [#{version}]" )
-      message( "  - source     : ${CMAKE_CURRENT_SOURCE_DIR}" )
-      message( "  - build      : ${CMAKE_CURRENT_BINARY_DIR}" )
-      message( "  - install    : ${CMAKE_INSTALL_PREFIX}"     )
-      message( "  - build type : ${CMAKE_BUILD_TYPE}"       )
-      message( "" )
-      message( "Bundle variables set for this build:" )
-
-      ecbundle_set( ECKIT_ENABLE_ECKIT_GEO ON )
-      ecbundle_set( ECCODES_ENABLE_ECCODES_THREADS ON )
-      ecbundle_set( ECCODES_INSTALL_EXTRA_TOOLS ON )
-      ecbundle_set( ECCODES_ENABLE_MEMFS ON )
-      ecbundle_set( ECCODES_ENABLE_FORTRAN ON )
-      ecbundle_set( ECCODES_ENABLE_ECKIT_GEO OFF )
-      ecbundle_set( ODC_ENABLE_FORTRAN ON )
-      ecbundle_set( METKIT_ENABLE_BUILD_TOOLS OFF )
-      ecbundle_set( MIR_ENABLE_BUILD_TOOLS ON )
-      ecbundle_set( MIR_ENABLE_ECKIT_GEO ON )
-      ecbundle_set( MAGICS_ENABLE_ODB ON )
-      ecbundle_set( FDB5_ENABLE_BUILD_TOOLS OFF )
-      message("")
-
-      ####################################################################
-
-      find_package( ecbuild 3.0 QUIET )
-      project( ecmwf-toolbox VERSION #{version} )
-
-      ## Initialize
-      include(${CMAKE_CURRENT_BINARY_DIR}/init.cmake OPTIONAL)
-
-      ## Projects
-
-      ecbundle_add_project( eckit )
-      ecbundle_add_project( eccodes )
-      ecbundle_add_project( odc )
-      ecbundle_add_project( metkit )
-      ecbundle_add_project( atlas )
-      ecbundle_add_project( atlas-orca )
-      ecbundle_add_project( mir )
-      ecbundle_add_project( magics )
-      ecbundle_add_project( fdb5 )
-
-      ## Finalize
-      include(${CMAKE_CURRENT_BINARY_DIR}/final.cmake OPTIONAL)
-
-      if( ecbuild_FOUND )
-        ecbuild_install_project(NAME ${PROJECT_NAME})
-        ecbuild_print_summary()
-      endif()
-    CMAKE
-
-    mkdir "build" do
-      system "ecbuild", srcdir.to_s,
-             "-DENABLE_MPI=OFF",
-             "-DENABLE_TESTS=OFF",
-             *std_cmake_args
-      system "cmake", "--build", ".", "--", "-j#{ENV.make_jobs}"
-      system "cmake", "--install", "."
-    end
+    # ecbundle build — configure + build + install
+    system "ecbundle", "build",
+           "--src-dir", (buildpath/"source").to_s,
+           "--build-dir", (buildpath/"build").to_s,
+           "--prefix", prefix.to_s,
+           "--build-type", "Release",
+           "--without-tests",
+           "--cmake", "ENABLE_MPI=OFF",
+           "--install",
+           "-j#{ENV.make_jobs}"
 
     # Fix shim references in pkg-config files and ecbuild config headers
     Dir[lib/"pkgconfig/*.pc", include/"**/*_ecbuild_config.h"].each do |f|
