@@ -19,6 +19,7 @@ class EcmwfToolbox < Formula
   depends_on "gettext"
   depends_on "glib"
   depends_on "harfbuzz"
+  depends_on "jasper"
   depends_on "jpeg-turbo"
   depends_on "lapack"
   depends_on "libaec"
@@ -158,6 +159,7 @@ class EcmwfToolbox < Formula
            "--cmake", "ENABLE_PYTHON=OFF",
            "--cmake", "ENABLE_INSTALL_ECCODES_SAMPLES=ON",
            "--cmake", "INSTALL_LIB_DIR=lib",
+           "--cmake", "CMAKE_DISABLE_FIND_PACKAGE_MPI=ON",
            "--install",
            "-j#{ENV.make_jobs}"
 
@@ -172,7 +174,9 @@ class EcmwfToolbox < Formula
   end
 
   test do
-    assert_match "eckit version", shell_output("#{bin}/eckit-version")
-    assert_match "atlas", shell_output("#{bin}/atlas --version")
+    system bin/"eckit-version"
+    system bin/"atlas", "--version"
+    system bin/"codes_info"
+    system bin/"odc", "--version"
   end
 end
