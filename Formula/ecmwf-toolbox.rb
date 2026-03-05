@@ -15,6 +15,7 @@ class EcmwfToolbox < Formula
   depends_on "ecbuild" => :build
   depends_on "ecbundle" => :build
   depends_on "cairo"
+  depends_on "fftw"
   depends_on "gcc" # Fortran
   depends_on "lapack"
   depends_on "libaec"
@@ -26,6 +27,7 @@ class EcmwfToolbox < Formula
   depends_on "openssl@3"
   depends_on "pango"
   depends_on "proj"
+  depends_on "qhull"
   depends_on "eigen@3" => :recommended
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
@@ -37,8 +39,8 @@ class EcmwfToolbox < Formula
   conflicts_with "recmanj-org/ecmwf/odc", because: "ecmwf-toolbox includes odc"
 
   resource "eckit" do
-    url "https://github.com/ecmwf/eckit/archive/refs/tags/1.33.1.tar.gz"
-    sha256 "89878eb491fbc22c99b88f5b2a1521e1e3fe4b3779b0254ce3e11929a48cea74"
+    url "https://github.com/ecmwf/eckit/archive/refs/tags/1.32.4.tar.gz"
+    sha256 "8b2752016b4765c697c2ff85dda39366c9a8fdc798f6418565437759a8cbfed5"
   end
 
   resource "eccodes" do
@@ -149,6 +151,9 @@ class EcmwfToolbox < Formula
            "--build-type", "Release",
            "--without-tests",
            "--cmake", "ENABLE_MPI=OFF",
+           "--cmake", "ENABLE_PYTHON=OFF",
+           "--cmake", "ENABLE_INSTALL_ECCODES_SAMPLES=ON",
+           "--cmake", "INSTALL_LIB_DIR=lib",
            "--install",
            "-j#{ENV.make_jobs}"
 

@@ -17,6 +17,7 @@ class Eckit < Formula
   depends_on "cmake" => [:build, :test]
   depends_on "ecbuild" => [:build, :test]
   depends_on "lapack"
+  depends_on "libaec"
   depends_on "lz4"
   depends_on "openblas"
   depends_on "openssl@3"
