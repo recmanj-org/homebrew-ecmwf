@@ -16,6 +16,7 @@ class EcmwfToolbox < Formula
   depends_on "cairo"
   depends_on "fftw"
   depends_on "gcc" # Fortran
+  depends_on "jpeg-turbo"
   depends_on "lapack"
   depends_on "libaec"
   depends_on "libomp"
