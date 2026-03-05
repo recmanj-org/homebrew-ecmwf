@@ -138,6 +138,7 @@ class EcmwfToolbox < Formula
     YAML
 
     # ecbundle create — reads bundle.yml, generates source/CMakeLists.txt with symlinks
+    mkdir_p buildpath/"source"
     system "ecbundle", "create", "--bundle", buildpath.to_s
 
     # ecbundle build — configure + build + install
