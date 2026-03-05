@@ -1,0 +1,124 @@
+name: brew test-bot v2
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+concurrency:
+  group: test-v2-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run syntax check
+        run: brew test-bot --only-tap-syntax
+
+  build-bottles:
+    if: github.event_name == 'pull_request' && github.triggering_actor != 'github-actions[bot]'
+    needs: syntax
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macos-arm
+            runner: [self-hosted, platform-builder-MacOSX-arm64]
+            is-self-hosted: true
+          - name: ubuntu
+            runner: ubuntu-latest
+            is-self-hosted: false
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      pull-requests: read
+    steps:
+      # === Self-hosted runner steps ===
+      - name: Cleanup working directory
+        if: matrix.is-self-hosted
+        run: rm -rf "${GITHUB_WORKSPACE:?}"/*
+
+      - name: Checkout current branch
+        if: matrix.is-self-hosted
+        env:
+          PR_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          cd "$(brew --repository "${REPO_OWNER}/ecmwf")"
+          git restore .
+          git clean -fd
+          git fetch origin
+          git fetch origin "$PR_SHA" || true
+          git checkout --detach "$PR_SHA"
+
+      - name: Restore brew environment to baseline
+        if: matrix.is-self-hosted
+        run: brew bundle check --file="$HOME/.Brewfile"
+
+      # === GitHub-hosted runner steps ===
+      - name: Set up Homebrew
+        if: ${{ !matrix.is-self-hosted }}
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Homebrew Bundler RubyGems
+        if: ${{ !matrix.is-self-hosted }}
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ runner.os }}-rubygems-
+
+      - name: Install Homebrew Bundler RubyGems
+        if: ${{ !matrix.is-self-hosted && steps.cache.outputs.cache-hit != 'true' }}
+        run: brew install-bundler-gems
+
+      - name: Run homebrew cleanup
+        if: ${{ !matrix.is-self-hosted }}
+        run: brew test-bot --only-cleanup-before
+
+      # === Common steps ===
+      - name: Run the local system setup check
+        run: brew test-bot --only-setup
+        env:
+          GITHUB_ACTIONS_HOMEBREW_SELF_HOSTED: ${{ matrix.is-self-hosted && '1' || '' }}
+
+      - name: Build bottles
+        run: brew test-bot --only-formulae --fail-fast --skip-recursive-dependents --root-url=https://get-test.ecmwf.int/repository/homebrew
+        env:
+          GITHUB_ACTIONS_HOMEBREW_SELF_HOSTED: ${{ matrix.is-self-hosted && '1' || '' }}
+
+      - name: Upload bottles as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bottles_${{ matrix.name }}
+          path: "*.bottle.*"
+
+      - name: Cleanup brew environment after build
+        if: ${{ always() && matrix.is-self-hosted }}
+        continue-on-error: true
+        run: |
+          brew test-bot --only-cleanup-after
+          brew bundle cleanup --force --file="$HOME/.Brewfile"
+          brew bundle list --formula --file="$HOME/.Brewfile" | while read -r pkg; do
+            brew link --overwrite "$pkg" 2>/dev/null || true
+          done

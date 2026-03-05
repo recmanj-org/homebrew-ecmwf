@@ -1,0 +1,97 @@
+name: brew pr-pull v2
+on:
+  pull_request_target:
+    types:
+      - labeled
+
+concurrency:
+  group: publish-v2-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  pr-pull:
+    if: contains(github.event.pull_request.labels.*.name, 'pr-pull-v2')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      checks: read
+      contents: write
+      issues: read
+      pull-requests: write
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ github.token }}
+
+      - name: Cache Homebrew Bundler RubyGems
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ runner.os }}-rubygems-
+
+      - name: Install Homebrew Bundler RubyGems
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: brew install-bundler-gems
+
+      - name: Set up git
+        uses: Homebrew/actions/git-user-config@main
+
+      - name: Checkout PR branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: git checkout "$HEAD_REF"
+
+      - name: Pull bottles
+        id: pr-pull
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
+        run: brew pr-pull --debug --no-upload --retain-bottle-dir --root-url=https://get-test.ecmwf.int/repository/homebrew --tap="$GITHUB_REPOSITORY" "$PULL_REQUEST"
+
+      - name: Unzip artifacts and apply bottle commit
+        run: |
+          cd ${{ steps.pr-pull.outputs.bottle_path }}
+          unzip '*.zip' '*.json'
+          brew bottle --merge --write --debug --root-url=https://get-test.ecmwf.int/repository/homebrew ./*.json
+
+      - name: Push bottle commit
+        uses: Homebrew/actions/git-try-push@main
+        with:
+          branch: ${{ github.head_ref }}
+
+      - name: Rename bottles
+        run: |
+          cd ${{ steps.pr-pull.outputs.bottle_path }}
+          for json in *.json; do
+            local_name=$(jq -r '.[].bottle.tags[].local_filename' "$json")
+            remote_name=$(jq -r '.[].bottle.tags[].filename' "$json")
+            if [ -f "$local_name" ] && [ "$local_name" != "$remote_name" ]; then
+              echo "Renaming: $local_name -> $remote_name"
+              mv "$local_name" "$remote_name"
+            fi
+          done
+
+      - name: Upload bottles to Nexus
+        working-directory: ${{ steps.pr-pull.outputs.bottle_path }}
+        run: |
+          for file in *.bottle.tar.gz; do
+            if [ -f "$file" ]; then
+              echo "Uploading: $file"
+              http_code=$(curl -s -o /dev/null -w "%{http_code}" \
+                --user "${{ secrets.NEXUS_PUBLIC_TEST_REPO_UPLOAD_TOKEN }}" \
+                --upload-file "$file" \
+                "https://get-test.ecmwf.int/repository/homebrew/$file")
+
+              if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+                echo "Successfully uploaded! (HTTP $http_code)"
+              else
+                echo "Upload failed with HTTP $http_code"
+                exit 1
+              fi
+            fi
+          done
