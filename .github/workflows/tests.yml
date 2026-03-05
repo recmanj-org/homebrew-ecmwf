@@ -38,7 +38,7 @@ jobs:
           cd "$(brew --repository "${REPO_OWNER}/ecmwf")"
           git restore .
           git fetch origin master "$PR_SHA"
-          git checkout FETCH_HEAD
+          git checkout "$PR_SHA"
 
       - name: Set up Homebrew
         if: ${{ !contains(matrix.labels, 'self-hosted') }}
