@@ -145,7 +145,7 @@ class EcmwfToolbox < Formula
     system "ecbundle", "build",
            "--src-dir", (buildpath/"source").to_s,
            "--build-dir", (buildpath/"build").to_s,
-           "--prefix", prefix.to_s,
+           "--install-dir", prefix.to_s,
            "--build-type", "Release",
            "--without-tests",
            "--cmake", "ENABLE_MPI=OFF",
