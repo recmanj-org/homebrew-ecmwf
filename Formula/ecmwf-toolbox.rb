@@ -18,6 +18,7 @@ class EcmwfToolbox < Formula
   depends_on "gcc" # Fortran
   depends_on "lapack"
   depends_on "libaec"
+  depends_on "libomp"
   depends_on "libpng"
   depends_on "lz4"
   depends_on "netcdf"
