@@ -12,9 +12,8 @@ class EcmwfToolbox < Formula
 
   depends_on "cmake" => :build
   depends_on "ecbuild" => :build
-  depends_on "gcc" # Fortran
   depends_on "cairo"
-  depends_on "eigen@3" => :recommended
+  depends_on "gcc" # Fortran
   depends_on "lapack"
   depends_on "libaec"
   depends_on "libpng"
@@ -25,10 +24,15 @@ class EcmwfToolbox < Formula
   depends_on "openssl@3"
   depends_on "pango"
   depends_on "proj"
+  depends_on "eigen@3" => :recommended
   uses_from_macos "bison" => :build
-  uses_from_macos "bzip2"
   uses_from_macos "flex" => :build
+  uses_from_macos "bzip2"
   uses_from_macos "ncurses"
+
+  conflicts_with "eckit", because: "ecmwf-toolbox includes eckit"
+  conflicts_with "atlas", because: "ecmwf-toolbox includes atlas"
+  conflicts_with "odc", because: "ecmwf-toolbox includes odc"
 
   resource "eckit" do
     url "https://github.com/ecmwf/eckit/archive/refs/tags/1.32.4.tar.gz"
@@ -74,10 +78,6 @@ class EcmwfToolbox < Formula
     url "https://github.com/ecmwf/fdb/archive/refs/tags/5.19.0.tar.gz"
     sha256 "1275c4b89dcdfcb342a255e22a7d500070d5d32251910c4c2a10d5734c0590eb"
   end
-
-  conflicts_with "eckit", because: "ecmwf-toolbox includes eckit"
-  conflicts_with "atlas", because: "ecmwf-toolbox includes atlas"
-  conflicts_with "odc", because: "ecmwf-toolbox includes odc"
 
   def install
     # Stage each sub-project resource into source/<name>/
