@@ -31,10 +31,13 @@ jobs:
 
       - name: Checkout current branch
         if: ${{ contains(matrix.labels, 'self-hosted') }}
+        env:
+          PR_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          REPO_OWNER: ${{ github.repository_owner }}
         run: |
-          cd "$(brew --repository ecmwf/ecmwf)"
+          cd "$(brew --repository "${REPO_OWNER}/ecmwf")"
           git restore .
-          git fetch origin ${{ github.event.pull_request.head.sha || github.sha }}
+          git fetch origin "$PR_SHA"
           git checkout FETCH_HEAD
 
       - name: Set up Homebrew
