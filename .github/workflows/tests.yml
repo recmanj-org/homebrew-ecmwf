@@ -37,8 +37,7 @@ jobs:
         run: |
           cd "$(brew --repository "${REPO_OWNER}/ecmwf")"
           git restore .
-          git fetch --force origin master:master
-          git fetch origin "$PR_SHA"
+          git fetch origin
           git checkout "$PR_SHA"
 
       - name: Set up Homebrew
