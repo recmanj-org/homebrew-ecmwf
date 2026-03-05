@@ -60,8 +60,13 @@ jobs:
         run: brew install-bundler-gems
 
       - name: Run homebrew cleanup
-        if: ${{ !contains(matrix.labels, 'self-hosted') }}
         run: brew test-bot --only-cleanup-before
+
+      - name: Restore brew environment to baseline
+        if: ${{ contains(matrix.labels, 'self-hosted') }}
+        run: |
+          brew bundle install --file="$HOME/Brewfile" --no-upgrade
+          brew bundle check --file="$HOME/Brewfile"
 
       - name: Run the local system setup check
         run: brew test-bot --only-setup
@@ -79,3 +84,10 @@ jobs:
         with:
           name: bottles_${{ matrix.name }}
           path: "*.bottle.*"
+
+      - name: Cleanup brew environment after build
+        if: ${{ always() && contains(matrix.labels, 'self-hosted') }}
+        continue-on-error: true
+        run: |
+          brew bundle cleanup --force --file="$HOME/Brewfile"
+          brew cleanup
