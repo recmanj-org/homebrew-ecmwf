@@ -22,10 +22,10 @@ class Eckit < Formula
   depends_on "lapack"
   depends_on "lz4"
   depends_on "openblas"
+  depends_on "openssl@3"
   depends_on "eigen" => :recommended
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
-  uses_from_macos "openssl"
 
   def install
     mkdir "build" do
