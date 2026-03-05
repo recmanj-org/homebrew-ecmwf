@@ -30,9 +30,9 @@ class EcmwfToolbox < Formula
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
 
-  conflicts_with "eckit", because: "ecmwf-toolbox includes eckit"
-  conflicts_with "atlas", because: "ecmwf-toolbox includes atlas"
-  conflicts_with "odc", because: "ecmwf-toolbox includes odc"
+  conflicts_with "recmanj-org/ecmwf/eckit", because: "ecmwf-toolbox includes eckit"
+  conflicts_with "recmanj-org/ecmwf/atlas", because: "ecmwf-toolbox includes atlas"
+  conflicts_with "recmanj-org/ecmwf/odc", because: "ecmwf-toolbox includes odc"
 
   resource "eckit" do
     url "https://github.com/ecmwf/eckit/archive/refs/tags/1.32.4.tar.gz"
