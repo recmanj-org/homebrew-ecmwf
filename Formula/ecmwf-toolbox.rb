@@ -1,14 +1,13 @@
 class EcmwfToolbox < Formula
   desc "ECMWF monolithic bundle: eckit, eccodes, atlas, odc, magics, and more"
-  homepage "https://github.com/ecmwf/ecmwf-toolbox"
+  homepage "https://github.com/recmanj-org/homebrew-ecmwf"
   url "https://github.com/ecmwf/ecbundle/archive/refs/tags/2.4.0.tar.gz"
   version "2026.01.0.0"
   sha256 "542da932b6884383690b3ea144e3ec0f88f466364bec0422be11e6ea2faf457b"
   license "Apache-2.0"
 
   livecheck do
-    url "https://github.com/ecmwf/ecmwf-toolbox/tags"
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    skip "ecmwf-toolbox is a meta-bundle with no upstream release tags"
   end
 
   depends_on "cmake" => :build
@@ -162,6 +161,9 @@ class EcmwfToolbox < Formula
       inreplace f, Superenv.shims_path/ENV.cxx, ENV.cxx if File.read(f).include?(Superenv.shims_path.to_s)
       inreplace f, Superenv.shims_path/ENV.cc, ENV.cc if File.read(f).include?(Superenv.shims_path.to_s)
     end
+
+    # Remove build log that contains shim references
+    rm_f share/"ecmwf-toolbox/build.log"
   end
 
   test do
