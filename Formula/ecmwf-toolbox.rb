@@ -163,7 +163,7 @@ class EcmwfToolbox < Formula
     end
 
     # Remove build log that contains shim references
-    rm_f share/"ecmwf-toolbox/build.log"
+    rm share/"ecmwf-toolbox/build.log" if (share/"ecmwf-toolbox/build.log").exist?
   end
 
   test do
