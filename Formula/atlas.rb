@@ -16,6 +16,8 @@ class Atlas < Formula
   depends_on "eckit"
   depends_on "eigen" => :recommended # currently fails to build -- internactive make works, non-interactive fails
 
+  conflicts_with "ecmwf-toolbox", because: "ecmwf-toolbox includes atlas"
+
   def install
     mkdir "build" do
       system "ecbuild", "..", "-DENABLE_FORTRAN=OFF", *std_cmake_args

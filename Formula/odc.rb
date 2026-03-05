@@ -21,6 +21,8 @@ class Odc < Formula
   depends_on "eckit"
   depends_on "gcc"
 
+  conflicts_with "ecmwf-toolbox", because: "ecmwf-toolbox includes odc"
+
   def install
     mkdir "build" do
       system "ecbuild", "..", "-DENABLE_FORTRAN=ON", *std_cmake_args

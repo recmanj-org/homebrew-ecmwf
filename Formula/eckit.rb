@@ -27,6 +27,8 @@ class Eckit < Formula
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
 
+  conflicts_with "ecmwf-toolbox", because: "ecmwf-toolbox includes eckit"
+
   def install
     mkdir "build" do
       system "ecbuild", "..", "-DENABLE_MPI=OFF", *std_cmake_args
