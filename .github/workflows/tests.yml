@@ -89,5 +89,4 @@ jobs:
         if: ${{ always() && contains(matrix.labels, 'self-hosted') }}
         continue-on-error: true
         run: |
-          brew bundle cleanup --force --file="$HOME/.Brewfile"
-          brew cleanup
+          brew_bundle_cleanup
