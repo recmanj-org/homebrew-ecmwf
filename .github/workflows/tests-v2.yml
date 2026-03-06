@@ -102,11 +102,13 @@ jobs:
         run: brew test-bot --only-setup
         env:
           GITHUB_ACTIONS_HOMEBREW_SELF_HOSTED: ${{ matrix.is-self-hosted && '1' || '' }}
+          HOMEBREW_NO_AUTO_UPDATE: ${{ matrix.is-self-hosted && '1' || '' }}
 
       - name: Build bottles
         run: brew test-bot --only-formulae --fail-fast --skip-recursive-dependents --root-url=https://get-test.ecmwf.int/repository/homebrew
         env:
           GITHUB_ACTIONS_HOMEBREW_SELF_HOSTED: ${{ matrix.is-self-hosted && '1' || '' }}
+          HOMEBREW_NO_AUTO_UPDATE: ${{ matrix.is-self-hosted && '1' || '' }}
 
       - name: Upload bottles as artifact
         if: always()
