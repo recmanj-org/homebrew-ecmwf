@@ -12,8 +12,8 @@ class Atlas < Formula
   depends_on "cmake" => :build
   depends_on "ecbuild" => :build
   depends_on "eckit"
-  depends_on "eigen" => :recommended
   depends_on "libomp"
+  depends_on "eigen" => :recommended
 
   conflicts_with "ecmwf-toolbox", because: "ecmwf-toolbox includes atlas"
 
