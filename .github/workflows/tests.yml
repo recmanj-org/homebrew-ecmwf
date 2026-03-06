@@ -10,9 +10,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        name:
+          - ubuntu-latest
+          - macos-26-arm
+          - macos-26-gh
         include:
+          - name: ubuntu-latest
+            labels: [ubuntu-latest]
           - name: macos-26-arm
             labels: [self-hosted, platform-builder-MacOSX-26.3.1-arm64]
+          - name: macos-26-gh
+            labels: [macos26]
     runs-on: ${{ matrix.labels }}
     env:
       HOMEBREW_NO_INSTALL_FROM_API: 1
