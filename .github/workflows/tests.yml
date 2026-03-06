@@ -99,7 +99,7 @@ jobs:
           path: "*.bottle.*"
 
       - name: Cleanup brew environment after build
-        if: ${{ always() && matrix.is-self-hosted }}
+        if: ${{ always() && contains(matrix.labels, 'self-hosted') }}
         continue-on-error: true
         run: |
           brew test-bot --only-cleanup-after
