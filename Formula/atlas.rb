@@ -1,20 +1,22 @@
 class Atlas < Formula
   desc "ECMWF library for numerical weather prediction and climate modelling"
   homepage "https://github.com/ecmwf/atlas"
-  url "https://github.com/ecmwf/atlas/archive/refs/tags/0.33.0.tar.gz"
-  sha256 "a91fffe9cecb51c6ee8549cbc20f8279e7b1f67dd90448e6c04c1889281b0600"
+  url "https://github.com/ecmwf/atlas/archive/refs/tags/0.45.0.tar.gz"
+  sha256 "ca4b23f1489a1ecbdadb2ee152c8a7a8575784ed3b87b84b9db45a2d4f4d5838"
   license "Apache-2.0"
 
   bottle do
-    root_url "https://github.com/ecmwf/homebrew-ecmwf/releases/download/atlas-0.33.0"
-    rebuild 1
-    sha256 cellar: :any, ventura: "5c4866d6bd82c04168c404709452822a0c3aa842b3acc522586ec43fb4989001"
+    root_url "https://get-test.ecmwf.int/repository/homebrew"
   end
 
   depends_on "cmake" => :build
   depends_on "ecbuild" => :build
   depends_on "eckit"
-  depends_on "eigen" => :recommended # currently fails to build -- internactive make works, non-interactive fails
+  depends_on "fftw"
+  depends_on "libomp"
+  depends_on "eigen" => :recommended
+
+  conflicts_with "ecmwf-toolbox", because: "ecmwf-toolbox includes atlas"
 
   def install
     mkdir "build" do

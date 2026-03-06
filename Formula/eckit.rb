@@ -1,8 +1,8 @@
 class Eckit < Formula
   desc "ECMWF cross-platform c++ toolkit"
   homepage "https://github.com/ecmwf/eckit"
-  url "https://github.com/ecmwf/eckit/archive/refs/tags/1.24.4.tar.gz"
-  sha256 "b6129eb4f7b8532aa6905033e4cf7d09aadc8547c225780fea3db196e34e4671"
+  url "https://github.com/ecmwf/eckit/archive/refs/tags/1.33.1.tar.gz"
+  sha256 "89878eb491fbc22c99b88f5b2a1521e1e3fe4b3779b0254ce3e11929a48cea74"
   license "Apache-2.0"
 
   livecheck do
@@ -12,20 +12,20 @@ class Eckit < Formula
 
   bottle do
     root_url "https://get-test.ecmwf.int/repository/homebrew"
-    sha256 cellar: :any,                 arm64_ventura: "7e545a6c6f8c191f5bbd4257a9fafb94d726551545bb047c226fad4b7907598b"
-    sha256 cellar: :any,                 ventura:       "ffd407eb71e59778273b606849a313eddb97829f191459bd38c61afa7d3452ee"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0f90e46adb26221374b0fd8009d030996a513025b977b217fc913f4c32e7c701"
   end
 
   depends_on "cmake" => [:build, :test]
   depends_on "ecbuild" => [:build, :test]
   depends_on "lapack"
+  depends_on "libaec"
   depends_on "lz4"
   depends_on "openblas"
-  depends_on "eigen" => :recommended
+  depends_on "openssl@3"
+  depends_on "eigen@3" => :recommended
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
-  uses_from_macos "openssl"
+
+  conflicts_with "ecmwf-toolbox", because: "ecmwf-toolbox includes eckit"
 
   def install
     mkdir "build" do
@@ -33,20 +33,7 @@ class Eckit < Formula
       system "make", "install"
     end
 
-    shim_references = [
-      lib/"pkgconfig/eckit_mpi.pc",
-      lib/"pkgconfig/eckit_cmd.pc",
-      lib/"pkgconfig/eckit_test_value_custom_params.pc",
-      lib/"pkgconfig/eckit_option.pc",
-      lib/"pkgconfig/eckit_maths.pc",
-      lib/"pkgconfig/eckit_web.pc",
-      lib/"pkgconfig/eckit_sql.pc",
-      lib/"pkgconfig/eckit.pc",
-      lib/"pkgconfig/eckit_linalg.pc",
-      lib/"pkgconfig/eckit_geometry.pc",
-      lib/"pkgconfig/eckit_distributed.pc",
-      include/"eckit/eckit_ecbuild_config.h",
-    ]
+    shim_references = Dir[lib/"pkgconfig/eckit*.pc"] + [include/"eckit/eckit_ecbuild_config.h"]
     inreplace shim_references, Superenv.shims_path/ENV.cxx, ENV.cxx
     inreplace shim_references, Superenv.shims_path/ENV.cc, ENV.cc
   end
@@ -57,7 +44,7 @@ class Eckit < Formula
       cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
       find_package(ecbuild REQUIRED)
       project(test_eckit VERSION 0.1.0 LANGUAGES CXX)
-      set(CMAKE_CXX_STANDARD 11)
+      set(CMAKE_CXX_STANDARD 17)
       set(CMAKE_CXX_STANDARD_REQUIRED ON)
       ecbuild_find_package( NAME eckit REQUIRED )
       ecbuild_add_executable(

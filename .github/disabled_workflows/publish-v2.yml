@@ -1,20 +1,28 @@
-name: brew pr-pull
+name: brew pr-pull v2
 on:
   pull_request_target:
     types:
       - labeled
+
+concurrency:
+  group: publish-v2-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
 jobs:
   pr-pull:
+    if: contains(github.event.pull_request.labels.*.name, 'pr-pull-v2')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
+      actions: read
+      checks: read
       contents: write
-    if: contains(github.event.pull_request.labels.*.name, 'pr-pull')
-    runs-on: ubuntu-22.04
-    env:
-      HOMEBREW_NO_INSTALL_FROM_API: 1
+      issues: read
+      pull-requests: write
     steps:
       - name: Set up Homebrew
         id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@main
         with:
           token: ${{ github.token }}
 
@@ -27,11 +35,11 @@ jobs:
           restore-keys: ${{ runner.os }}-rubygems-
 
       - name: Install Homebrew Bundler RubyGems
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        if: steps.cache.outputs.cache-hit != 'true'
         run: brew install-bundler-gems
 
       - name: Set up git
-        uses: Homebrew/actions/git-user-config@master
+        uses: Homebrew/actions/git-user-config@main
 
       - name: Checkout PR branch
         env:
@@ -52,44 +60,37 @@ jobs:
           brew bottle --merge --write --debug --root-url=https://get-test.ecmwf.int/repository/homebrew ./*.json
 
       - name: Push bottle commit
-        env:
-          HEAD_REF: ${{ github.head_ref }}
-        run: git push origin "$HEAD_REF"
+        uses: Homebrew/actions/git-try-push@main
+        with:
+          branch: ${{ github.head_ref }}
 
-        # brew creates bottles with a different name than what should be uploaded
-        # when installing it's searching for file with the new name
       - name: Rename bottles
-        shell: python
         run: |
-          import os
-          import json
+          cd ${{ steps.pr-pull.outputs.bottle_path }}
+          for json in *.json; do
+            local_name=$(jq -r '.[].bottle.tags[].local_filename' "$json")
+            remote_name=$(jq -r '.[].bottle.tags[].filename' "$json")
+            if [ -f "$local_name" ] && [ "$local_name" != "$remote_name" ]; then
+              echo "Renaming: $local_name -> $remote_name"
+              mv "$local_name" "$remote_name"
+            fi
+          done
 
-          def rename(data):
-            key1 = next(iter(data))
-            key2 = next(iter(data[key1]["bottle"]["tags"]))
-            obj = data[key1]["bottle"]["tags"][key2]
-            filename = obj["filename"]
-            local_filename = obj["local_filename"]
-            os.rename(local_filename, filename)
-
-          for filename in os.listdir("."):
-            if filename.endswith(".json"):
-              with open(filename, "r") as json_file:
-                data = json.load(json_file)
-                rename(data)
-
-      - name: Upload bottles
+      - name: Upload bottles to Nexus
+        working-directory: ${{ steps.pr-pull.outputs.bottle_path }}
         run: |
           for file in *.bottle.tar.gz; do
             if [ -f "$file" ]; then
               echo "Uploading: $file"
-              response=$(curl -w "%{http_code}" --user "${{ secrets.NEXUS_PUBLIC_TEST_REPO_UPLOAD_TOKEN }}" --upload-file "$file" "https://get-test.ecmwf.int/repository/homebrew/$file")
+              http_code=$(curl -s -o /dev/null -w "%{http_code}" \
+                --user "${{ secrets.NEXUS_PUBLIC_TEST_REPO_UPLOAD_TOKEN }}" \
+                --upload-file "$file" \
+                "https://get-test.ecmwf.int/repository/homebrew/$file")
 
-              status=$(echo "$response" | tail -c 4)
-              if [ "$status" -eq 201 ] || [ "$status" -eq 200 ]; then
-                echo "Successfully uploaded!"
+              if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+                echo "Successfully uploaded! (HTTP $http_code)"
               else
-                echo "$status: Upload failed"
+                echo "Upload failed with HTTP $http_code"
                 exit 1
               fi
             fi
