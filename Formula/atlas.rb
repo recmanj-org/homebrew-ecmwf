@@ -12,6 +12,7 @@ class Atlas < Formula
   depends_on "cmake" => :build
   depends_on "ecbuild" => :build
   depends_on "eckit"
+  depends_on "fftw"
   depends_on "libomp"
   depends_on "eigen" => :recommended
 
