@@ -38,6 +38,8 @@ jobs:
           - name: macos-26-gh
             labels: [macos-26]
     runs-on: ${{ matrix.labels }}
+    env:
+      GITHUB_ACTIONS_HOMEBREW_SELF_HOSTED: ${{ contains(matrix.labels, 'self-hosted') && '1' || '' }}
     steps:
       - name: Checkout current branch
         if: ${{ contains(matrix.labels, 'self-hosted') }}
