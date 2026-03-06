@@ -78,7 +78,7 @@ jobs:
       - name: Run homebrew cleanup
         run: brew test-bot --only-cleanup-before
 
-      - name: Restore brew environment to baseline
+      - name: Check brew environment baseline
         if: ${{ contains(matrix.labels, 'self-hosted') }}
         run: |
           brew bundle check --file="$HOME/.Brewfile"
