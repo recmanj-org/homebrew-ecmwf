@@ -69,6 +69,8 @@ jobs:
       - name: Restore brew environment to baseline
         if: matrix.is-self-hosted
         run: brew bundle check --file="$HOME/.Brewfile"
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
 
       # === GitHub-hosted runner steps ===
       - name: Set up Homebrew
