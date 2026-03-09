@@ -38,23 +38,27 @@ jobs:
         uses: Homebrew/actions/git-user-config@main
 
       - name: Checkout PR branch
-        run: git checkout ${{ github.head_ref }}
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: git checkout "$HEAD_REF"
 
       - name: Pull bottles
         id: pr-pull
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
           PULL_REQUEST: ${{ github.event.pull_request.number }}
-        run: brew pr-pull --debug --no-upload --retain-bottle-dir --root-url=https://get-test.ecmwf.int/repository/homebrew --tap=$GITHUB_REPOSITORY $PULL_REQUEST
+        run: brew pr-pull --debug --no-upload --retain-bottle-dir --root-url=https://get-test.ecmwf.int/repository/homebrew --tap="$GITHUB_REPOSITORY" "$PULL_REQUEST"
 
       - name: Unzip artifacts and apply bottle commit
         run: |
           cd ${{ steps.pr-pull.outputs.bottle_path }}
           unzip '*.zip' '*.json'
-          brew bottle --merge --write --debug --root-url=https://get-test.ecmwf.int/repository/homebrew *.json
+          brew bottle --merge --write --debug --root-url=https://get-test.ecmwf.int/repository/homebrew ./*.json
 
       - name: Push bottle commit
-        run: git push origin ${{ github.head_ref }}
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: git push origin "$HEAD_REF"
 
         # brew creates bottles with a different name than what should be uploaded
         # when installing it's searching for file with the new name
@@ -80,13 +84,13 @@ jobs:
 
       - name: Upload bottles
         run: |
-          for file in *.bottle.tar.gz; do
+          for file in ./*.bottle.tar.gz; do
             if [ -f "$file" ]; then
               echo "Uploading: $file"
-              response=$(curl -w "%{http_code}" --user "${{ secrets.NEXUS_PUBLIC_TEST_REPO_UPLOAD_TOKEN }}" --upload-file $file https://get-test.ecmwf.int/repository/homebrew/$file)
-              
-              status=$(echo $response | tail -c 4)
-              if [ $status -eq 201 ] || [ $status -eq 200 ]; then
+              response=$(curl -w "%{http_code}" --user "${{ secrets.NEXUS_PUBLIC_TEST_REPO_UPLOAD_TOKEN }}" --upload-file "$file" "https://get-test.ecmwf.int/repository/homebrew/$file")
+
+              status=$(echo "$response" | tail -c 4)
+              if [ "$status" -eq 201 ] || [ "$status" -eq 200 ]; then
                 echo "Successfully uploaded!"
               else
                 echo "$status: Upload failed"
