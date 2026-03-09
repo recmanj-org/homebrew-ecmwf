@@ -22,7 +22,7 @@ class Eckit < Formula
   depends_on "lapack"
   depends_on "lz4"
   depends_on "openblas"
-  depends_on "eigen" => :recommended
+  depends_on "eigen@3" => :recommended
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
   uses_from_macos "openssl@3"
