@@ -29,7 +29,11 @@ class Eckit < Formula
 
   def install
     mkdir "build" do
-      system "ecbuild", "..", "-DENABLE_MPI=OFF", *std_cmake_args
+      args = %W[
+        -DENABLE_MPI=OFF
+        -DCMAKE_PREFIX_PATH=#{Formula["eigen@3"].opt_prefix}
+      ]
+      system "ecbuild", "..", *args, *std_cmake_args
       system "make", "install"
     end
 
