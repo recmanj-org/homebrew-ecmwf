@@ -25,7 +25,7 @@ class Eckit < Formula
   depends_on "eigen" => :recommended
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
-  uses_from_macos "openssl"
+  uses_from_macos "openssl@3"
 
   def install
     mkdir "build" do
