@@ -11,10 +11,13 @@ class Ecbuild < Formula
   end
 
   bottle do
-    root_url "https://get-test.ecmwf.int/repository/homebrew"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "1ac3298fff255d4428cd0e315603bf10b1f856a6f264f643843158d329fe6882"
-    sha256 cellar: :any_skip_relocation, ventura:       "4d647030395ba5817b2be8918e4726792a478e926c8052e76ff6f3b059817ce9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d63291bcf24bcaaa4407c027485a1e9553b9d9ab45873ad1fba7c46a3a485d2a"
+    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/ecbuild-3.13.1"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "de2aa2b264893911c57e961fbbeea5c6f5324ab58a971cc3874021c869464f4a"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a7a3c3aae0a418a939306b40571097a8e86f0b7fddebaa82b71630648b4be6c1"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7790bc22f340533270ed509feb9622a9a695ec924011c9d3eac9833bc0d187a2"
+    sha256 cellar: :any_skip_relocation, tahoe:         "7296bd5b00510a385c8752e673ea1f96e97a801647f389992b7e5c0ae8646ebd"
+    sha256 cellar: :any_skip_relocation, sequoia:       "cfef4db4241ae650a8de3b4d6c975344b3806232d52f3b2bc0cae50a7133b512"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4bc8d11440e910b0afa7d83edc719718a88f9f5a421e12aceedac27f84f7d79c"
   end
 
   depends_on "cmake"
