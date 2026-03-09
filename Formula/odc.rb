@@ -16,6 +16,8 @@ class Odc < Formula
     sha256 x86_64_linux: "a82433834fa7297b69106c37343c1f0b56f51f373e2215de7c80cc223e60228d"
   end
 
+  disable! date: "2026-03-09", because: "replaced with ecmwf/homebrew-ecmwf/ecmwf-toolbox"
+
   depends_on "cmake" => :build
   depends_on "ecbuild" => :build
   depends_on "eckit"
