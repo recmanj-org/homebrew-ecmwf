@@ -80,8 +80,8 @@ jobs:
           cred="https://x-access-token:${ECMWF_TOOLBOX_TOKEN}@github.com"
           echo "$cred" >> ~/.git-credentials
           git config --global credential.helper store
-          if [ -d /home/linuxbrew ]; then
-            sudo bash -c "echo '$cred' >> /home/linuxbrew/.git-credentials"
+          if id linuxbrew &>/dev/null; then
+            sudo bash -c "echo '$cred' >> ~linuxbrew/.git-credentials"
             sudo -u linuxbrew git config --global credential.helper store
           fi
 
