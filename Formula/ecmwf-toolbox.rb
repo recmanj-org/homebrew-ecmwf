@@ -21,6 +21,7 @@ class EcmwfToolbox < Formula
   depends_on "gcc"
   depends_on "jasper"
   depends_on "libaec"
+  depends_on "libomp"
   depends_on "libzip"
   depends_on "lz4"
   depends_on "netcdf"
