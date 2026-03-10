@@ -66,6 +66,27 @@ jobs:
           chmod 600 ~/.netrc
           echo "--netrc-optional" >> ~/.curlrc
 
+      - name: Debug auth setup
+        run: |
+          echo "=== Token presence ==="
+          if [ -n "${{ secrets.ECMWF_TOOLBOX_TOKEN }}" ]; then echo "Token is SET"; else echo "Token is EMPTY"; fi
+          echo "=== .netrc exists ==="
+          ls -la ~/.netrc
+          echo "=== .netrc content (masked) ==="
+          awk '{if(NF>=6) print $1,$2,$3,$4,"****"; else print}' ~/.netrc
+          echo "=== .curlrc content ==="
+          cat ~/.curlrc
+          echo "=== HOMEBREW_CURLRC ==="
+          echo "HOMEBREW_CURLRC=$HOMEBREW_CURLRC"
+          echo "=== Test curl to github.com (HEAD, follow redirects) ==="
+          curl -sI -L --netrc-optional -o /dev/null -w "github.com: HTTP %{http_code}, redirect_url=%{redirect_url}\n" "https://github.com/recmanj/ecmwf-toolbox/archive/refs/tags/2026.01.0.0.tar.gz" || true
+          echo "=== Test curl to API endpoint ==="
+          curl -sI --netrc-optional -o /dev/null -w "api: HTTP %{http_code}\n" "https://api.github.com/repos/recmanj/ecmwf-toolbox/tarball/2026.01.0.0" || true
+          echo "=== Which curl ==="
+          which curl && curl --version | head -1
+          echo "=== Homebrew curl ==="
+          brew --prefix curl 2>/dev/null || echo "No brewed curl"
+
       - name: Set up Homebrew
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@main
@@ -87,7 +108,7 @@ jobs:
       - run: brew test-bot --only-setup
 
       - name: Build bottles
-        run: brew test-bot --only-formulae --fail-fast
+        run: brew test-bot --only-formulae --fail-fast --verbose
 
       - name: Upload bottles as artifact
         if: always()
