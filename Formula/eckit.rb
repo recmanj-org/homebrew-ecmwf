@@ -12,7 +12,7 @@ class Eckit < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-2.0.2_2"
+    root_url "https://ghcr.io/v2/recmanj-org/homebrew-ecmwf/eckit-2.0.2_2"
     sha256 cellar: :any,                 arm64_tahoe:   "f951d4a6cb9093d1f80195dbca0014eca99d2eb352f0be4388e07f40ba0b6a09"
     sha256 cellar: :any,                 arm64_sequoia: "96cac940a4df017e9ae93a7e81b9c873157d5043a30a7ef56b2cce6f701851bd"
     sha256 cellar: :any,                 arm64_sonoma:  "2d12510d0b8838e0eb25c155aae1e06df82957e32d0461a7b95e9070136cd732"

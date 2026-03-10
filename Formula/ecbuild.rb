@@ -12,7 +12,7 @@ class Ecbuild < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/ecbuild-3.13.1_2"
+    root_url "https://ghcr.io/v2/recmanj-org/homebrew-ecmwf/ecbuild-3.13.1_2"
     sha256 cellar: :any_skip_relocation, arm64_tahoe:   "6ea59b3368ecff6ec842ac180ac61ec2e3b3044b4b25cc8e55daf4ca5179dc14"
     sha256 cellar: :any_skip_relocation, arm64_sequoia: "a6582e55e68892a1708b4ddd6af53296d4467660d85f85fc910e6d611a1155eb"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:  "78e5fb35ff62d126dd2070266170aa3b80e1b26fe603661eb99bd68f3bcc5056"
