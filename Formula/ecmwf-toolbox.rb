@@ -105,6 +105,7 @@ class EcmwfToolbox < Formula
            "--cmake", "ENABLE_FDB5=ON",
            "--cmake", "ENABLE_INSTALL_ECCODES_SAMPLES=ON",
            "--cmake", "INSTALL_LIB_DIR=lib",
+           "--cmake", "ATLAS_ENABLE_OMP=OFF",
            "--install",
            "-j#{ENV.make_jobs}"
 
