@@ -1,8 +1,8 @@
 class Eckit < Formula
   desc "ECMWF cross-platform c++ toolkit"
   homepage "https://github.com/ecmwf/eckit"
-  url "https://github.com/ecmwf/eckit/archive/refs/tags/1.24.4.tar.gz"
-  sha256 "b6129eb4f7b8532aa6905033e4cf7d09aadc8547c225780fea3db196e34e4671"
+  url "https://github.com/ecmwf/eckit/archive/refs/tags/2.0.2.tar.gz"
+  sha256 "46b9c1f90e0b565698c5c79c54676401d33738ec82995c025d5d5aabeb13ad2b"
   license "Apache-2.0"
 
   livecheck do
@@ -11,9 +11,11 @@ class Eckit < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-1.24.4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "0f632baeb525593c81b014996111d817fc63d1d5648880675b7a19400d2c61c6"
+    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-2.0.2"
+    sha256 cellar: :any,                 arm64_tahoe:   "3b2501f7891c262a122c7fd75c759db9e6a1df0898372b891f7e92344f47b006"
+    sha256 cellar: :any,                 arm64_sequoia: "c99708cb0e126ca8b167d68b5cfc6f8944a0b976f00da40d35033585fd137e00"
+    sha256 cellar: :any,                 arm64_sonoma:  "b1d5a517176463db5756a0ccf21b69cb3757d73abfac2347860195aba0f812c3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "65b07d70ac7bad81ed12d7ebf2bbf64b29203b651a178d2aaa3cfad02ef0eba3"
   end
 
   depends_on "cmake" => [:build, :test]
@@ -48,6 +50,9 @@ class Eckit < Formula
       lib/"pkgconfig/eckit_linalg.pc",
       lib/"pkgconfig/eckit_geometry.pc",
       lib/"pkgconfig/eckit_distributed.pc",
+      lib/"pkgconfig/eckit_spec.pc",
+      lib/"pkgconfig/eckit_geo.pc",
+      lib/"pkgconfig/eckit_codec.pc",
       include/"eckit/eckit_ecbuild_config.h",
     ]
     inreplace shim_references, Superenv.shims_path/ENV.cxx, ENV.cxx
@@ -60,7 +65,7 @@ class Eckit < Formula
       cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
       find_package(ecbuild REQUIRED)
       project(test_eckit VERSION 0.1.0 LANGUAGES CXX)
-      set(CMAKE_CXX_STANDARD 11)
+      set(CMAKE_CXX_STANDARD 17)
       set(CMAKE_CXX_STANDARD_REQUIRED ON)
       ecbuild_find_package( NAME eckit REQUIRED )
       ecbuild_add_executable(

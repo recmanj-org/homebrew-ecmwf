@@ -11,6 +11,8 @@ class Atlas < Formula
     sha256 cellar: :any, ventura: "5c4866d6bd82c04168c404709452822a0c3aa842b3acc522586ec43fb4989001"
   end
 
+  disable! date: "2026-03-09", because: "replaced with ecmwf/homebrew-ecmwf/ecmwf-toolbox"
+
   depends_on "cmake" => :build
   depends_on "ecbuild" => :build
   depends_on "eckit"
