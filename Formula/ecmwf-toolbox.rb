@@ -22,6 +22,7 @@ class EcmwfToolbox < Formula
   depends_on "jasper"
   depends_on "libaec"
   depends_on "libomp"
+  depends_on "libpng"
   depends_on "libzip"
   depends_on "lz4"
   depends_on "netcdf"
@@ -32,6 +33,8 @@ class EcmwfToolbox < Formula
   depends_on "python@3.13"
   depends_on "qhull"
   depends_on "snappy"
+  uses_from_macos "bzip2"
+  uses_from_macos "ncurses"
 
   def install
     # Projects on ECMWF Bitbucket that have public GitHub mirrors
@@ -90,12 +93,32 @@ class EcmwfToolbox < Formula
     # ecbundle build: cmake configure + compile + install
     system "ecbundle", "build",
            "--src-dir", "source",
+           "--build-dir", "build",
            "--install-dir", prefix.to_s,
-           "--build-type", "Release"
+           "--build-type", "Release",
+           "--without-tests",
+           "--cmake", "ENABLE_AEC=ON",
+           "--cmake", "ENABLE_FFTW=ON",
+           "--cmake", "ENABLE_NETCDF=ON",
+           "--cmake", "ENABLE_PROJ=ON",
+           "--cmake", "ENABLE_PNG=ON",
+           "--cmake", "ENABLE_FDB5=ON",
+           "--cmake", "ENABLE_INSTALL_ECCODES_SAMPLES=ON",
+           "--cmake", "INSTALL_LIB_DIR=lib",
+           "--install",
+           "-j#{ENV.make_jobs}"
+
+    # Fix shim references in pkg-config files and ecbuild config headers
+    Dir[lib/"pkgconfig/*.pc", include/"**/*_ecbuild_config.h"].each do |f|
+      inreplace f, Superenv.shims_path/ENV.cxx, ENV.cxx if File.read(f).include?(Superenv.shims_path.to_s)
+      inreplace f, Superenv.shims_path/ENV.cc, ENV.cc if File.read(f).include?(Superenv.shims_path.to_s)
+    end
+
+    # Remove build log that contains shim references
+    rm pkgshare/"build.log" if (pkgshare/"build.log").exist?
   end
 
   test do
-    # eccodes is a core component - verify it's installed
-    assert_path_exists lib/shared_library("libeccodes")
+    system bin/"codes_info"
   end
 end
