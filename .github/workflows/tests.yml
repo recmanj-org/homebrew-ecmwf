@@ -77,8 +77,13 @@ jobs:
 
       - name: Configure git credentials for private repos
         run: |
-          echo "https://x-access-token:${ECMWF_TOOLBOX_TOKEN}@github.com" >> ~/.git-credentials
+          cred="https://x-access-token:${ECMWF_TOOLBOX_TOKEN}@github.com"
+          echo "$cred" >> ~/.git-credentials
           git config --global credential.helper store
+          if [ -d /home/linuxbrew ]; then
+            sudo bash -c "echo '$cred' >> /home/linuxbrew/.git-credentials"
+            sudo -u linuxbrew git config --global credential.helper store
+          fi
 
       - run: brew test-bot --only-cleanup-before
 
