@@ -13,6 +13,7 @@ class EcmwfToolbox < Formula
 
   depends_on "cmake" => :build
   depends_on "ecbundle" => :build
+  depends_on "pkg-config" => :build
   depends_on "cairo"
   depends_on "curl"
   depends_on "eigen"
@@ -91,16 +92,6 @@ class EcmwfToolbox < Formula
       end
     end
 
-    # Ensure all dependency headers/libs are visible to the compiler
-    # (Linuxbrew ARM shims don't always propagate include paths)
-    deps.each do |dep|
-      formula = dep.to_formula
-      inc = formula.opt_include
-      lib = formula.opt_lib
-      ENV.append_to_cflags "-I#{inc}" if inc.directory?
-      ENV.append "LDFLAGS", "-L#{lib}" if lib.directory?
-    end
-
     # ecbundle create: downloads all git repos + generates CMakeLists.txt
     system "ecbundle", "create", "--bundle", buildpath.to_s
 
@@ -124,14 +115,14 @@ class EcmwfToolbox < Formula
            "-j#{ENV.make_jobs}"
 
     # Fix shim references in pkg-config files and ecbuild config headers
-    Dir[lib/"pkgconfig/*.pc", include/"**/*_ecbuild_config.h"].each do |f|
-      inreplace f, Superenv.shims_path/ENV.cxx, ENV.cxx if File.read(f).include?(Superenv.shims_path.to_s)
-      inreplace f, Superenv.shims_path/ENV.cc, ENV.cc if File.read(f).include?(Superenv.shims_path.to_s)
+    files_to_fix = Dir[lib/"pkgconfig/*.pc", include/"**/*_ecbuild_config.h"]
+    
+    inreplace files_to_fix do |s|
+      s.gsub! "#{Superenv.shims_path}/", ""
     end
 
     # Remove build log that contains shim references
-    rm pkgshare/"build.log" if (pkgshare/"build.log").exist?
-  end
+    rm_f pkgshare/"build.log"
 
   test do
     system bin/"codes_info"
