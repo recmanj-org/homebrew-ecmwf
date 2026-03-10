@@ -4,6 +4,7 @@ class Ecbuild < Formula
   url "https://github.com/ecmwf/ecbuild/archive/refs/tags/3.13.1.tar.gz"
   sha256 "9759815aef22c9154589ea025056db086c575af9dac635614b561ab825f9477e"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://github.com/ecmwf/ecbuild/tags"
@@ -11,13 +12,14 @@ class Ecbuild < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/ecbuild-3.13.1"
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "de2aa2b264893911c57e961fbbeea5c6f5324ab58a971cc3874021c869464f4a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a7a3c3aae0a418a939306b40571097a8e86f0b7fddebaa82b71630648b4be6c1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7790bc22f340533270ed509feb9622a9a695ec924011c9d3eac9833bc0d187a2"
-    sha256 cellar: :any_skip_relocation, tahoe:         "7296bd5b00510a385c8752e673ea1f96e97a801647f389992b7e5c0ae8646ebd"
-    sha256 cellar: :any_skip_relocation, sequoia:       "cfef4db4241ae650a8de3b4d6c975344b3806232d52f3b2bc0cae50a7133b512"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4bc8d11440e910b0afa7d83edc719718a88f9f5a421e12aceedac27f84f7d79c"
+    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/ecbuild-3.13.1_1"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d8c37120852c480e5a39e8d49860971c33b3fae224ba5426af6214938e1e2453"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f59fefb113c6272707365fb53d1dfe8e3f2182e53f001ac4d52ff2b1b5d8e3c4"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1859e55b7ca0b13fc325cde8a7b81a6ab26d9e4abba4d6704de0e89bdbd6636b"
+    sha256 cellar: :any_skip_relocation, tahoe:         "5012a3cd7c1b96772dbfcdaab1cda5d4aaf72847fa7716a39646170b164c9b76"
+    sha256 cellar: :any_skip_relocation, sequoia:       "4418b1c2803cf6ae0cc7b0f797c3b1d3f21d9509f776ed419ca7f7d5549f6abc"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "9a2cbd83559e12f59f583c6b83980fb01b2d079dc1fd9461bf59706e1c22e8a8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "70962d2e0c8f379752b1c63310199ce7b2a25126535da9f27c8112af4d2eff6a"
   end
 
   depends_on "cmake"

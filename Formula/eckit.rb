@@ -4,6 +4,7 @@ class Eckit < Formula
   url "https://github.com/ecmwf/eckit/archive/refs/tags/2.0.2.tar.gz"
   sha256 "46b9c1f90e0b565698c5c79c54676401d33738ec82995c025d5d5aabeb13ad2b"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://github.com/ecmwf/eckit/tags"
@@ -11,11 +12,12 @@ class Eckit < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-2.0.2"
-    sha256 cellar: :any,                 arm64_tahoe:   "3b2501f7891c262a122c7fd75c759db9e6a1df0898372b891f7e92344f47b006"
-    sha256 cellar: :any,                 arm64_sequoia: "c99708cb0e126ca8b167d68b5cfc6f8944a0b976f00da40d35033585fd137e00"
-    sha256 cellar: :any,                 arm64_sonoma:  "b1d5a517176463db5756a0ccf21b69cb3757d73abfac2347860195aba0f812c3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "65b07d70ac7bad81ed12d7ebf2bbf64b29203b651a178d2aaa3cfad02ef0eba3"
+    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-2.0.2_1"
+    sha256 cellar: :any,                 arm64_tahoe:   "28e0dddcbed334202df3c6702155160ab6952bc81d7f4e3920ee19e072627db0"
+    sha256 cellar: :any,                 arm64_sequoia: "c49c183af8817a679417f30ef18699b4cf1956297888d623a180967fe1ddca08"
+    sha256 cellar: :any,                 arm64_sonoma:  "fe50ab335e221581ccc018ec01298520e774de8461a68ac9edd865ef98afa043"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "47a2bab36efc09ef2aeb039b8350416b9393368674726cd58121017a3cdfd2dc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e5765219c5f406245627b90f98c8b5ffe1c5372634db0cc417a3003e5ce2ca12"
   end
 
   depends_on "cmake" => [:build, :test]
