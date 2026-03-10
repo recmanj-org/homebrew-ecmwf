@@ -12,14 +12,14 @@ class Ecbuild < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/ecbuild-3.13.1_1"
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d8c37120852c480e5a39e8d49860971c33b3fae224ba5426af6214938e1e2453"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f59fefb113c6272707365fb53d1dfe8e3f2182e53f001ac4d52ff2b1b5d8e3c4"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1859e55b7ca0b13fc325cde8a7b81a6ab26d9e4abba4d6704de0e89bdbd6636b"
-    sha256 cellar: :any_skip_relocation, tahoe:         "5012a3cd7c1b96772dbfcdaab1cda5d4aaf72847fa7716a39646170b164c9b76"
-    sha256 cellar: :any_skip_relocation, sequoia:       "4418b1c2803cf6ae0cc7b0f797c3b1d3f21d9509f776ed419ca7f7d5549f6abc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9a2cbd83559e12f59f583c6b83980fb01b2d079dc1fd9461bf59706e1c22e8a8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "70962d2e0c8f379752b1c63310199ce7b2a25126535da9f27c8112af4d2eff6a"
+    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/ecbuild-3.13.1_2"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "6ea59b3368ecff6ec842ac180ac61ec2e3b3044b4b25cc8e55daf4ca5179dc14"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a6582e55e68892a1708b4ddd6af53296d4467660d85f85fc910e6d611a1155eb"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "78e5fb35ff62d126dd2070266170aa3b80e1b26fe603661eb99bd68f3bcc5056"
+    sha256 cellar: :any_skip_relocation, tahoe:         "8845cbb6813f21f390a705cb6daef29193e9acd54507e3a7c5cee40695145f3d"
+    sha256 cellar: :any_skip_relocation, sequoia:       "d33588bde5fb94caf825f33a22677acdf61933e8a30ea358a0208ea09e18cc7b"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "9fe7128e6fcef030a66109814e0dd468d6be4dc1aacaf34d5de90b5cdf62ce61"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "609a7a34de09ceeb74a3342defdd19c70d85280aaafacb6f7d77a18cbab042e8"
   end
 
   depends_on "cmake"
