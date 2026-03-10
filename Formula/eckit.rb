@@ -11,9 +11,11 @@ class Eckit < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-1.24.4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "0f632baeb525593c81b014996111d817fc63d1d5648880675b7a19400d2c61c6"
+    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-2.0.2"
+    sha256 cellar: :any,                 arm64_tahoe:   "3b2501f7891c262a122c7fd75c759db9e6a1df0898372b891f7e92344f47b006"
+    sha256 cellar: :any,                 arm64_sequoia: "c99708cb0e126ca8b167d68b5cfc6f8944a0b976f00da40d35033585fd137e00"
+    sha256 cellar: :any,                 arm64_sonoma:  "b1d5a517176463db5756a0ccf21b69cb3757d73abfac2347860195aba0f812c3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "65b07d70ac7bad81ed12d7ebf2bbf64b29203b651a178d2aaa3cfad02ef0eba3"
   end
 
   depends_on "cmake" => [:build, :test]
