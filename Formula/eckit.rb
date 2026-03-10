@@ -12,12 +12,12 @@ class Eckit < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-2.0.2_1"
-    sha256 cellar: :any,                 arm64_tahoe:   "28e0dddcbed334202df3c6702155160ab6952bc81d7f4e3920ee19e072627db0"
-    sha256 cellar: :any,                 arm64_sequoia: "c49c183af8817a679417f30ef18699b4cf1956297888d623a180967fe1ddca08"
-    sha256 cellar: :any,                 arm64_sonoma:  "fe50ab335e221581ccc018ec01298520e774de8461a68ac9edd865ef98afa043"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "47a2bab36efc09ef2aeb039b8350416b9393368674726cd58121017a3cdfd2dc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e5765219c5f406245627b90f98c8b5ffe1c5372634db0cc417a3003e5ce2ca12"
+    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/eckit-2.0.2_2"
+    sha256 cellar: :any,                 arm64_tahoe:   "f951d4a6cb9093d1f80195dbca0014eca99d2eb352f0be4388e07f40ba0b6a09"
+    sha256 cellar: :any,                 arm64_sequoia: "96cac940a4df017e9ae93a7e81b9c873157d5043a30a7ef56b2cce6f701851bd"
+    sha256 cellar: :any,                 arm64_sonoma:  "2d12510d0b8838e0eb25c155aae1e06df82957e32d0461a7b95e9070136cd732"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "2607a3ffb5d46050e1dc0cef54479eb17a8b0055802106035fb8d6f7d19aa0d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "32fef73b9a40132fc23a17e4e71a2a83dbb5995cb398d4365fbfb294d423c1c6"
   end
 
   depends_on "cmake" => [:build, :test]
