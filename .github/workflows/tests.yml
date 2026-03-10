@@ -46,6 +46,7 @@ jobs:
     needs: syntax
     if: ${{ github.event_name == 'pull_request' && github.triggering_actor != 'github-actions[bot]' }}
     env:
+      HOMEBREW_ECMWF_TOOLBOX_TOKEN: ${{ secrets.ECMWF_TOOLBOX_TOKEN }}
       ECMWF_TOOLBOX_TOKEN: ${{ secrets.ECMWF_TOOLBOX_TOKEN }}
     strategy:
       matrix:
