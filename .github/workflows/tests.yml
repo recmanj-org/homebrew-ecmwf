@@ -62,6 +62,7 @@ jobs:
           echo "machine github.com login x-access-token password ${{ secrets.ECMWF_TOOLBOX_TOKEN }}" >> ~/.netrc
           echo "machine codeload.github.com login x-access-token password ${{ secrets.ECMWF_TOOLBOX_TOKEN }}" >> ~/.netrc
           chmod 600 ~/.netrc
+          echo "--netrc-optional" >> ~/.curlrc
 
       - name: Set up Homebrew
         id: set-up-homebrew
