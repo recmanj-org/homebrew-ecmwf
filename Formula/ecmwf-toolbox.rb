@@ -2,7 +2,7 @@ class EcmwfToolbox < Formula
   desc "ECMWF software bundle: ecCodes, Magics, Metview, Atlas, and more"
   homepage "https://github.com/recmanj/ecmwf-toolbox"
   url "https://github.com/recmanj/ecmwf-toolbox.git",
-      tag: "2026.01.0.0",
+      tag:      "2026.01.0.0",
       revision: "bbbf647ae3c43326de15781d033c547b75bee8f4"
   license "Apache-2.0"
 
