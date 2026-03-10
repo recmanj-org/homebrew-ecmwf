@@ -13,7 +13,7 @@ class Ecbundle < Formula
   end
 
   bottle do
-    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/ecbundle-2.4.0"
+    root_url "https://ghcr.io/v2/recmanj-org/homebrew-ecmwf/ecbundle-2.4.0"
     sha256 cellar: :any_skip_relocation, arm64_tahoe:   "34f2c6670e941768a45d4cb42e46aeb455e7b7adb594e1150dffaf7b49ce5d54"
     sha256 cellar: :any_skip_relocation, arm64_sequoia: "0e05b263849554e0c79362a0969145f8a1e8835a0d695ac6f3dbef9933b908de"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8c1ba36c580da4782c62cbb3acacaf73f9a81219c0fc45e64ab2743a937f7725"
