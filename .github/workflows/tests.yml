@@ -75,6 +75,11 @@ jobs:
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         run: brew install-bundler-gems
 
+      - name: Configure git credentials for private repos
+        run: |
+          echo "https://x-access-token:${ECMWF_TOOLBOX_TOKEN}@github.com" >> ~/.git-credentials
+          git config --global credential.helper store
+
       - run: brew test-bot --only-cleanup-before
 
       - run: brew test-bot --only-setup
