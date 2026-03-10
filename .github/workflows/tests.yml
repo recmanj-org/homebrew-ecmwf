@@ -66,27 +66,6 @@ jobs:
           chmod 600 ~/.netrc
           echo "--netrc-optional" >> ~/.curlrc
 
-      - name: Debug auth setup
-        run: |
-          echo "=== Token presence ==="
-          if [ -n "${{ secrets.ECMWF_TOOLBOX_TOKEN }}" ]; then echo "Token is SET"; else echo "Token is EMPTY"; fi
-          echo "=== .netrc exists ==="
-          ls -la ~/.netrc
-          echo "=== .netrc content (masked) ==="
-          awk '{if(NF>=6) print $1,$2,$3,$4,"****"; else print}' ~/.netrc
-          echo "=== .curlrc content ==="
-          cat ~/.curlrc
-          echo "=== HOMEBREW_CURLRC ==="
-          echo "HOMEBREW_CURLRC=$HOMEBREW_CURLRC"
-          echo "=== Test curl to github.com (HEAD, follow redirects) ==="
-          curl -sI -L --netrc-optional -o /dev/null -w "github.com: HTTP %{http_code}, redirect_url=%{redirect_url}\n" "https://github.com/recmanj/ecmwf-toolbox/archive/refs/tags/2026.01.0.0.tar.gz" || true
-          echo "=== Test curl to API endpoint ==="
-          curl -sI --netrc-optional -o /dev/null -w "api: HTTP %{http_code}\n" "https://api.github.com/repos/recmanj/ecmwf-toolbox/tarball/2026.01.0.0" || true
-          echo "=== Which curl ==="
-          which curl && curl --version | head -1
-          echo "=== Homebrew curl ==="
-          brew --prefix curl 2>/dev/null || echo "No brewed curl"
-
       - name: Set up Homebrew
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@main
@@ -106,6 +85,55 @@ jobs:
       - run: brew test-bot --only-cleanup-before
 
       - run: brew test-bot --only-setup
+
+      - name: Debug auth and download
+        run: |
+          echo "=== .netrc still intact? ==="
+          ls -la ~/.netrc
+          awk '{if(NF>=6) print $1,$2,$3,$4,"****"; else print}' ~/.netrc
+          echo "=== .curlrc still intact? ==="
+          cat ~/.curlrc 2>/dev/null || echo ".curlrc MISSING"
+          echo "=== HOMEBREW_CURLRC ==="
+          echo "HOMEBREW_CURLRC=${HOMEBREW_CURLRC:-unset}"
+          echo "=== Homebrew env (curl-related) ==="
+          brew config | grep -i curl || true
+          env | grep -i homebrew | sort || true
+          echo "=== Which curl does Homebrew use? ==="
+          which curl
+          brew --prefix curl 2>/dev/null || echo "No brewed curl"
+          echo "=== Test GET (not HEAD) to archive URL ==="
+          curl -sS -L --netrc-optional -o /dev/null -w "archive GET: HTTP %{http_code}, size=%{size_download}, url_effective=%{url_effective}\n" "https://github.com/recmanj/ecmwf-toolbox/archive/refs/tags/2026.01.0.0.tar.gz" || true
+          echo "=== Test GET to API tarball ==="
+          curl -sS -L --netrc-optional -o /dev/null -w "api GET: HTTP %{http_code}, size=%{size_download}, url_effective=%{url_effective}\n" "https://api.github.com/repos/recmanj/ecmwf-toolbox/tarball/2026.01.0.0" || true
+          echo "=== Test with explicit Authorization header ==="
+          curl -sS -L -o /dev/null -w "explicit auth: HTTP %{http_code}, size=%{size_download}\n" -H "Authorization: token ${{ secrets.ECMWF_TOOLBOX_TOKEN }}" "https://api.github.com/repos/recmanj/ecmwf-toolbox/tarball/2026.01.0.0" || true
+          echo "=== Check repo visibility ==="
+          curl -sS -w "\nHTTP %{http_code}\n" -H "Authorization: token ${{ secrets.ECMWF_TOOLBOX_TOKEN }}" "https://api.github.com/repos/recmanj/ecmwf-toolbox" | head -5 || true
+          echo "=== Brew cache location ==="
+          brew --cache 2>/dev/null || true
+
+      - name: Pre-fetch source into Homebrew cache
+        run: |
+          CACHE_DIR=$(brew --cache)
+          FORMULA_CACHE=$(brew --cache --formula recmanj-org/homebrew-ecmwf/ecmwf-toolbox 2>/dev/null) || true
+          echo "Cache dir: $CACHE_DIR"
+          echo "Formula cache: $FORMULA_CACHE"
+          if [ -n "$FORMULA_CACHE" ]; then
+            mkdir -p "$(dirname "$FORMULA_CACHE")"
+            echo "Downloading to $FORMULA_CACHE ..."
+            curl -sS -L -H "Authorization: token ${{ secrets.ECMWF_TOOLBOX_TOKEN }}" \
+              -o "$FORMULA_CACHE" \
+              "https://api.github.com/repos/recmanj/ecmwf-toolbox/tarball/2026.01.0.0"
+            ls -la "$FORMULA_CACHE"
+            echo "SHA256: $(shasum -a 256 "$FORMULA_CACHE" | awk '{print $1}')"
+          else
+            echo "Could not determine formula cache path, trying manual download to cache dir"
+            curl -sS -L -H "Authorization: token ${{ secrets.ECMWF_TOOLBOX_TOKEN }}" \
+              -o /tmp/ecmwf-toolbox.tar.gz \
+              "https://api.github.com/repos/recmanj/ecmwf-toolbox/tarball/2026.01.0.0"
+            ls -la /tmp/ecmwf-toolbox.tar.gz
+            echo "SHA256: $(shasum -a 256 /tmp/ecmwf-toolbox.tar.gz | awk '{print $1}')"
+          fi
 
       - name: Build bottles
         run: brew test-bot --only-formulae --fail-fast --verbose
