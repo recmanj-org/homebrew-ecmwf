@@ -87,10 +87,13 @@ class EcmwfToolbox < Formula
       end
     end
 
-    # Ensure OpenMP headers/libs are visible to the compiler
-    if Formula["libomp"].opt_prefix.exist?
-      ENV.append_to_cflags "-I#{Formula["libomp"].opt_include}"
-      ENV.append "LDFLAGS", "-L#{Formula["libomp"].opt_lib}"
+    # Ensure all dependency headers/libs are visible to the compiler
+    # (Linuxbrew ARM shims don't always propagate include paths)
+    deps.each do |dep|
+      inc = dep.opt_include
+      lib = dep.opt_lib
+      ENV.append_to_cflags "-I#{inc}" if inc.directory?
+      ENV.append "LDFLAGS", "-L#{lib}" if lib.directory?
     end
 
     # ecbundle create: downloads all git repos + generates CMakeLists.txt
