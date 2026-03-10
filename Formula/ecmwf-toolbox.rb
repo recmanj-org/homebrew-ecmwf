@@ -34,11 +34,11 @@ class EcmwfToolbox < Formula
   depends_on "python@3.13"
   depends_on "qhull"
   depends_on "snappy"
+  uses_from_macos "bzip2"
+  uses_from_macos "ncurses"
   on_linux do
     depends_on "util-linux"
   end
-  uses_from_macos "bzip2"
-  uses_from_macos "ncurses"
 
   def install
     # Projects on ECMWF Bitbucket that have public GitHub mirrors
