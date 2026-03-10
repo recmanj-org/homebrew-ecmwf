@@ -12,6 +12,17 @@ class Ecbundle < Formula
     regex(/^v?(\d(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://github.com/recmanj-org/homebrew-ecmwf/releases/download/ecbundle-2.4.0"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "34f2c6670e941768a45d4cb42e46aeb455e7b7adb594e1150dffaf7b49ce5d54"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0e05b263849554e0c79362a0969145f8a1e8835a0d695ac6f3dbef9933b908de"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8c1ba36c580da4782c62cbb3acacaf73f9a81219c0fc45e64ab2743a937f7725"
+    sha256 cellar: :any_skip_relocation, tahoe:         "fb2addfab926a55028cf8b9779b819bc495cb54a45177be2ad31de9b85d0fe3b"
+    sha256 cellar: :any_skip_relocation, sequoia:       "bf5b604ff13f35d84c54408a056c0277e41c1193f48b7c275f47e90ba2abe0b1"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "aa21b78af9d89b288e72007f9efd6520b4fb0927dd9d3c2f6aae097c9a3908b5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a1d2b215364701f202c35a143c2a0461bd8f5cd2737bb9eee5fbbfc6e3570908"
+  end
+
   depends_on "python@3.13"
 
   resource "ruamel-yaml" do
