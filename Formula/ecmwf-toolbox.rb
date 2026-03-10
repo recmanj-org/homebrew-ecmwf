@@ -13,8 +13,24 @@ class EcmwfToolbox < Formula
 
   depends_on "cmake" => :build
   depends_on "ecbundle" => :build
+  depends_on "cairo"
+  depends_on "curl"
+  depends_on "eigen"
+  depends_on "expat"
+  depends_on "fftw"
   depends_on "gcc"
+  depends_on "jasper"
   depends_on "libaec"
+  depends_on "libzip"
+  depends_on "lz4"
+  depends_on "netcdf"
+  depends_on "open-mpi"
+  depends_on "openjpeg"
+  depends_on "pango"
+  depends_on "proj"
+  depends_on "python@3.13"
+  depends_on "qhull"
+  depends_on "snappy"
 
   def install
     # Projects on ECMWF Bitbucket that have public GitHub mirrors
@@ -79,6 +95,6 @@ class EcmwfToolbox < Formula
 
   test do
     # eccodes is a core component - verify it's installed
-    assert_path_exists lib/"libeccodes.dylib"
+    assert_path_exists lib/shared_library("libeccodes")
   end
 end
