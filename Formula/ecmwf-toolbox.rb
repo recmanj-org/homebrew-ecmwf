@@ -16,30 +16,48 @@ class EcmwfToolbox < Formula
   depends_on "gcc" # for Fortran (eccodes, odc, metview enable Fortran)
 
   def install
-    # Map BITBUCKET projects to their Bitbucket Server paths
-    bitbucket_projects = {
-      "ECKIT"       => "ecsdk/eckit",
-      "ODC"         => "odb/odc",
-      "METKIT"      => "ecsdk/metkit",
-      "ODB"         => "odb/odb",
-      "ODB_TOOLS"   => "odb/odb-tools",
-      "MAGICS"      => "mag/magics",
-      "FDB5"        => "mars/fdb5",
-      "MARS_CLIENT" => "mars/mars-client",
-      "METVIEW"     => "metv/metview",
+    # Projects on ECMWF Bitbucket that have public GitHub mirrors
+    github_mirrors = {
+      "ECKIT"       => "ecmwf/eckit",
+      "ODC"         => "ecmwf/odc",
+      "METKIT"      => "ecmwf/metkit",
+      "MAGICS"      => "ecmwf/magics",
+      "MARS_CLIENT" => "ecmwf/mars-client",
+      "METVIEW"     => "ecmwf/metview",
     }
 
-    # If ECMWF_BITBUCKET_TOKEN is set, construct HTTPS URLs for all BITBUCKET projects
+    # Projects on ECMWF Bitbucket with no public mirror (skip by default)
+    private_projects = {
+      "ODB"       => "odb/odb",
+      "ODB_TOOLS" => "odb/odb-tools",
+      "FDB5"      => "mars/fdb5",
+    }
+
     token = ENV["ECMWF_BITBUCKET_TOKEN"]
     if token
-      bitbucket_projects.each do |name, bb_path|
+      # With Bitbucket token: use authenticated HTTPS for all Bitbucket projects
+      bitbucket_paths = {
+        "ECKIT"       => "ecsdk/eckit",
+        "ODC"         => "odb/odc",
+        "METKIT"      => "ecsdk/metkit",
+        "MAGICS"      => "mag/magics",
+        "MARS_CLIENT" => "mars/mars-client",
+        "METVIEW"     => "metv/metview",
+      }.merge(private_projects)
+
+      bitbucket_paths.each do |name, bb_path|
         ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://#{token}@git.ecmwf.int/scm/#{bb_path}.git"
       end
-    end
+    else
+      # Without Bitbucket token: redirect mirrored projects to GitHub HTTPS
+      github_mirrors.each do |name, gh_repo|
+        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://github.com/#{gh_repo}.git"
+      end
 
-    # Skip packages without public mirrors by default (user can unset to include them)
-    %w[ODB ODB_TOOLS FDB5].each do |name|
-      ENV["ECMWF_TOOLBOX_SKIP_#{name}"] = "1" unless ENV["ECMWF_TOOLBOX_SKIP_#{name}"]
+      # Skip private projects that have no public mirror
+      private_projects.each_key do |name|
+        ENV["ECMWF_TOOLBOX_SKIP_#{name}"] = "1" unless ENV["ECMWF_TOOLBOX_SKIP_#{name}"]
+      end
     end
 
     # ecbundle create: downloads all git repos + generates CMakeLists.txt
