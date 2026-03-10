@@ -45,6 +45,8 @@ jobs:
   test-bot:
     needs: syntax
     if: ${{ github.event_name == 'pull_request' && github.triggering_actor != 'github-actions[bot]' }}
+    env:
+      ECMWF_TOOLBOX_TOKEN: ${{ secrets.ECMWF_TOOLBOX_TOKEN }}
     strategy:
       matrix:
         runner:
