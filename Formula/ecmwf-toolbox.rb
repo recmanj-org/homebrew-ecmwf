@@ -13,7 +13,8 @@ class EcmwfToolbox < Formula
 
   depends_on "cmake" => :build
   depends_on "ecbundle" => :build
-  depends_on "gcc" # for Fortran (eccodes, odc, metview enable Fortran)
+  depends_on "gcc"
+  depends_on "libaec"
 
   def install
     # Projects on ECMWF Bitbucket that have public GitHub mirrors
