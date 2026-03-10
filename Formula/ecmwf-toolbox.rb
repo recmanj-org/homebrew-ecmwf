@@ -19,6 +19,7 @@ class EcmwfToolbox < Formula
   depends_on "expat"
   depends_on "fftw"
   depends_on "gcc"
+  depends_on "glib"
   depends_on "jasper"
   depends_on "libaec"
   depends_on "libomp"
@@ -33,6 +34,9 @@ class EcmwfToolbox < Formula
   depends_on "python@3.13"
   depends_on "qhull"
   depends_on "snappy"
+  on_linux do
+    depends_on "util-linux"
+  end
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
 
