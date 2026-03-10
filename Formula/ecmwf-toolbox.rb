@@ -87,6 +87,12 @@ class EcmwfToolbox < Formula
       end
     end
 
+    # Ensure OpenMP headers/libs are visible to the compiler
+    if Formula["libomp"].opt_prefix.exist?
+      ENV.append_to_cflags "-I#{Formula["libomp"].opt_include}"
+      ENV.append "LDFLAGS", "-L#{Formula["libomp"].opt_lib}"
+    end
+
     # ecbundle create: downloads all git repos + generates CMakeLists.txt
     system "ecbundle", "create", "--bundle", buildpath.to_s
 
@@ -105,6 +111,7 @@ class EcmwfToolbox < Formula
            "--cmake", "ENABLE_FDB5=ON",
            "--cmake", "INSTALL_LIB_DIR=lib",
            "--cmake", "CMAKE_PREFIX_PATH=#{ENV["CMAKE_PREFIX_PATH"]}",
+           "--cmake", "OpenMP_ROOT=#{Formula["libomp"].opt_prefix}",
            "--install",
            "-j#{ENV.make_jobs}"
 
