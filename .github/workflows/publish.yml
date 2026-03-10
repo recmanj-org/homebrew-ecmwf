@@ -11,6 +11,7 @@ jobs:
       checks: read
       contents: write
       issues: read
+      packages: write
       pull-requests: write
     if: contains(github.event.pull_request.labels.*.name, 'pr-pull')
     runs-on: ubuntu-latest
@@ -57,6 +58,7 @@ jobs:
           --no-cherry-pick
           --workflows=tests.yml
           --tap="$GITHUB_REPOSITORY"
+          --root-url="https://ghcr.io/v2/recmanj-org/homebrew-ecmwf"
           "$PULL_REQUEST"
 
       - name: Push bottle commits to PR branch
