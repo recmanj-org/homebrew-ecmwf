@@ -90,8 +90,9 @@ class EcmwfToolbox < Formula
     # Ensure all dependency headers/libs are visible to the compiler
     # (Linuxbrew ARM shims don't always propagate include paths)
     deps.each do |dep|
-      inc = dep.opt_include
-      lib = dep.opt_lib
+      formula = dep.to_formula
+      inc = formula.opt_include
+      lib = formula.opt_lib
       ENV.append_to_cflags "-I#{inc}" if inc.directory?
       ENV.append "LDFLAGS", "-L#{lib}" if lib.directory?
     end
