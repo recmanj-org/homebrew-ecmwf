@@ -4,6 +4,7 @@ class Eckit < Formula
   url "https://github.com/ecmwf/eckit/archive/refs/tags/2.0.2.tar.gz"
   sha256 "46b9c1f90e0b565698c5c79c54676401d33738ec82995c025d5d5aabeb13ad2b"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://github.com/ecmwf/eckit/tags"
