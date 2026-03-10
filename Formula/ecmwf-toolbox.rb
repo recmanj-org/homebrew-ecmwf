@@ -18,44 +18,50 @@ class EcmwfToolbox < Formula
   def install
     # Projects on ECMWF Bitbucket that have public GitHub mirrors
     github_mirrors = {
-      "ECKIT"       => "ecmwf/eckit",
-      "ODC"         => "ecmwf/odc",
-      "METKIT"      => "ecmwf/metkit",
-      "MAGICS"      => "ecmwf/magics",
+      "ECKIT"  => "ecmwf/eckit",
+      "ODC"    => "ecmwf/odc",
+      "METKIT" => "ecmwf/metkit",
+      "MAGICS" => "ecmwf/magics",
+      "FDB5"   => "ecmwf/fdb",
+    }
+
+    # Private GitHub repos (need ECMWF_TOOLBOX_TOKEN)
+    private_github = {
       "MARS_CLIENT" => "ecmwf/mars-client",
       "METVIEW"     => "ecmwf/metview",
     }
 
-    # Projects on ECMWF Bitbucket with no public mirror (skip by default)
-    private_projects = {
+    # Private Bitbucket repos (need ECMWF_BITBUCKET_TOKEN)
+    private_bitbucket = {
       "ODB"       => "odb/odb",
       "ODB_TOOLS" => "odb/odb-tools",
-      "FDB5"      => "mars/fdb5",
     }
 
-    token = ENV["ECMWF_BITBUCKET_TOKEN"]
-    if token
-      # With Bitbucket token: use authenticated HTTPS for all Bitbucket projects
-      bitbucket_paths = {
-        "ECKIT"       => "ecsdk/eckit",
-        "ODC"         => "odb/odc",
-        "METKIT"      => "ecsdk/metkit",
-        "MAGICS"      => "mag/magics",
-        "MARS_CLIENT" => "mars/mars-client",
-        "METVIEW"     => "metv/metview",
-      }.merge(private_projects)
+    # Redirect mirrored Bitbucket projects to GitHub HTTPS (always works)
+    github_mirrors.each do |name, gh_repo|
+      ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://github.com/#{gh_repo}.git"
+    end
 
-      bitbucket_paths.each do |name, bb_path|
-        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://#{token}@git.ecmwf.int/scm/#{bb_path}.git"
+    # With Bitbucket token: use authenticated HTTPS for Bitbucket-only projects
+    bb_token = ENV["ECMWF_BITBUCKET_TOKEN"]
+    if bb_token
+      private_bitbucket.each do |name, bb_path|
+        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://#{bb_token}@git.ecmwf.int/scm/#{bb_path}.git"
       end
     else
-      # Without Bitbucket token: redirect mirrored projects to GitHub HTTPS
-      github_mirrors.each do |name, gh_repo|
-        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://github.com/#{gh_repo}.git"
+      private_bitbucket.each_key do |name|
+        ENV["ECMWF_TOOLBOX_SKIP_#{name}"] = "1" unless ENV["ECMWF_TOOLBOX_SKIP_#{name}"]
       end
+    end
 
-      # Skip private projects that have no public mirror
-      private_projects.each_key do |name|
+    # With GitHub token: use authenticated HTTPS for private GitHub projects
+    gh_token = ENV["ECMWF_TOOLBOX_TOKEN"]
+    if gh_token
+      private_github.each do |name, gh_repo|
+        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://#{gh_token}@github.com/#{gh_repo}.git"
+      end
+    else
+      private_github.each_key do |name|
         ENV["ECMWF_TOOLBOX_SKIP_#{name}"] = "1" unless ENV["ECMWF_TOOLBOX_SKIP_#{name}"]
       end
     end
