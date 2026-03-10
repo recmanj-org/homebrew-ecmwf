@@ -103,7 +103,6 @@ class EcmwfToolbox < Formula
            "--cmake", "ENABLE_PROJ=ON",
            "--cmake", "ENABLE_PNG=ON",
            "--cmake", "ENABLE_FDB5=ON",
-           "--cmake", "ENABLE_INSTALL_ECCODES_SAMPLES=ON",
            "--cmake", "INSTALL_LIB_DIR=lib",
            "--cmake", "CMAKE_PREFIX_PATH=#{ENV["CMAKE_PREFIX_PATH"]}",
            "--install",
