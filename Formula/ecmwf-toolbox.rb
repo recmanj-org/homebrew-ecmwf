@@ -14,12 +14,13 @@ class GitHubPrivateDownloadStrategy < GitHubGitDownloadStrategy
 
     @token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"].to_s
     @original_url = url
-    super(url, name, version, **meta)
+    super
     @url = "https://x-access-token:#{@token}@github.com/#{match[:owner]}/#{match[:repo]}.git" unless @token.empty?
   end
 
   def fetch(timeout: nil)
     raise "HOMEBREW_ECMWF_TOOLBOX_TOKEN is required to download #{@original_url}" if @token.empty?
+
     super
   end
 end
@@ -28,7 +29,7 @@ class EcmwfToolbox < Formula
   desc "ECMWF software bundle: ecCodes, Magics, Metview, Atlas, and more"
   homepage "https://github.com/recmanj/ecmwf-toolbox"
   url "https://github.com/recmanj/ecmwf-toolbox.git",
-      tag: "2026.01.0.0",
+      tag:   "2026.01.0.0",
       using: GitHubPrivateDownloadStrategy
   license "Apache-2.0"
 
