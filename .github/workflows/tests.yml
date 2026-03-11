@@ -47,6 +47,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && github.triggering_actor != 'github-actions[bot]' }}
     env:
       ECMWF_TOOLBOX_TOKEN: ${{ secrets.ECMWF_TOOLBOX_TOKEN }}
+      GIT_TERMINAL_PROMPT: "0"
     strategy:
       matrix:
         runner:
@@ -77,7 +78,8 @@ jobs:
 
       - name: Configure git credentials for private repos
         run: |
-          git config --global url."https://x-access-token:${ECMWF_TOOLBOX_TOKEN}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://x-access-token:${ECMWF_TOOLBOX_TOKEN}@github.com/ecmwf/".insteadOf "https://github.com/ecmwf/"
+          git config --global url."https://x-access-token:${ECMWF_TOOLBOX_TOKEN}@github.com/recmanj/".insteadOf "https://github.com/recmanj/"
 
       - run: brew test-bot --only-cleanup-before
 
