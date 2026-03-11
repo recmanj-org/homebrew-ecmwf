@@ -116,7 +116,7 @@ class EcmwfToolbox < Formula
 
     # Fix shim references in pkg-config files and ecbuild config headers
     files_to_fix = Dir[lib/"pkgconfig/*.pc", include/"**/*_ecbuild_config.h"]
-    
+
     inreplace files_to_fix do |s|
       s.gsub! "#{Superenv.shims_path}/", ""
     end
