@@ -1,36 +1,12 @@
-require "download_strategy"
-
-class GitHubPrivateDownloadStrategy < GitHubGitDownloadStrategy
-  GITHUB_REPO_URL_REGEX = %r{
-    \Ahttps://github\.com/
-    (?<owner>[^/]+)/
-    (?<repo>[^/]+)\.git
-    \z
-  }x
-
-  def initialize(url, name, version, **meta)
-    match = url.match(GITHUB_REPO_URL_REGEX)
-    raise "Unsupported GitHub repository URL: #{url}" unless match
-
-    @token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"].to_s
-    @original_url = url
-    super
-    @url = "https://x-access-token:#{@token}@github.com/#{match[:owner]}/#{match[:repo]}.git" unless @token.empty?
-  end
-
-  def fetch(timeout: nil)
-    raise "HOMEBREW_ECMWF_TOOLBOX_TOKEN is required to download #{@original_url}" if @token.empty?
-
-    super
-  end
-end
+require_relative "../lib/github_private_download_strategy"
 
 class EcmwfToolbox < Formula
   desc "ECMWF software bundle: ecCodes, Magics, Metview, Atlas, and more"
   homepage "https://github.com/recmanj/ecmwf-toolbox"
   url "https://github.com/recmanj/ecmwf-toolbox.git",
-      tag:   "2026.01.0.0",
-      using: GitHubPrivateDownloadStrategy
+      tag:       "2026.01.0.0",
+      using:     GitHubPrivateDownloadStrategy,
+      token_env: "HOMEBREW_ECMWF_TOOLBOX_TOKEN"
   license "Apache-2.0"
 
   depends_on "cmake" => :build
