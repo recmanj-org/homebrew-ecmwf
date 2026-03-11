@@ -98,6 +98,15 @@ class EcmwfToolbox < Formula
       ENV.append "LDFLAGS", "-L#{Formula["libomp"].opt_lib}"
     end
 
+    # On Linux, shadow system clang-tidy with a no-op script. Atlas
+    # auto-enables clang-tidy when found, and the system clang can't
+    # find omp.h from GCC's internal include paths.
+    unless OS.mac?
+      (buildpath/"bin/clang-tidy").write "#!/bin/sh\nexit 0\n"
+      chmod 0755, buildpath/"bin/clang-tidy"
+      ENV.prepend_path "PATH", buildpath/"bin"
+    end
+
     # ecbundle create: downloads all git repos + generates CMakeLists.txt
     system "ecbundle", "create", "--bundle", buildpath.to_s
 
@@ -115,7 +124,6 @@ class EcmwfToolbox < Formula
            "--cmake", "ENABLE_PNG=ON",
            "--cmake", "ENABLE_FDB5=ON",
            "--cmake", "ENABLE_CLANG_TIDY=OFF",
-           "--cmake", "CMAKE_CXX_CLANG_TIDY=",
            "--cmake", "INSTALL_LIB_DIR=lib",
            "--cmake", "CMAKE_PREFIX_PATH=#{ENV["CMAKE_PREFIX_PATH"]}",
            "--cmake", "OpenMP_ROOT=#{Formula["libomp"].opt_prefix}",
