@@ -35,7 +35,7 @@ class EcmwfToolbox < Formula
   homepage "https://github.com/recmanj/ecmwf-toolbox"
   url "https://github.com/recmanj/ecmwf-toolbox/archive/refs/tags/2026.01.0.0.tar.gz",
       using: GitHubPrivateDownloadStrategy
-  sha256 "fe8b131c76b2b78c34f04a275a1e16d2b1ef29fa7c245a549ab45c5a5bc0aa9b"
+  sha256 "b7a4ce8ce09f4a39b357853b35d95e9b6d42f94a1442abf10e4d32f5a7b2991e"
   license "Apache-2.0"
 
   livecheck do
