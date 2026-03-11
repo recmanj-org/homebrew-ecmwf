@@ -1,8 +1,7 @@
 class TokenAuthGitDownloadStrategy < GitDownloadStrategy
   def initialize(url, name, version, **meta)
-    token = ENV["ECMWF_TOOLBOX_TOKEN"]
+    token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]
     authed_url = token ? url.sub("https://github.com/", "https://x-access-token:#{token}@github.com/") : url
-    $stderr.puts "[TokenAuthGitDownloadStrategy] token_present=#{!token.nil?} url_rewritten=#{url != authed_url}"
     super(authed_url, name, version, **meta)
   end
 end
@@ -61,13 +60,13 @@ class EcmwfToolbox < Formula
       "FDB5"   => "ecmwf/fdb",
     }
 
-    # Private GitHub repos (need ECMWF_TOOLBOX_TOKEN)
+    # Private GitHub repos (need HOMEBREW_ECMWF_TOOLBOX_TOKEN)
     private_github = {
       "MARS_CLIENT" => "ecmwf/mars-client",
       "METVIEW"     => "ecmwf/metview",
     }
 
-    # Private Bitbucket repos (need ECMWF_BITBUCKET_TOKEN)
+    # Private Bitbucket repos (need HOMEBREW_ECMWF_BITBUCKET_TOKEN)
     private_bitbucket = {
       "ODB"       => "odb/odb",
       "ODB_TOOLS" => "odb/odb-tools",
@@ -79,7 +78,7 @@ class EcmwfToolbox < Formula
     end
 
     # With Bitbucket token: use authenticated HTTPS for Bitbucket-only projects
-    bb_token = ENV["ECMWF_BITBUCKET_TOKEN"]
+    bb_token = ENV["HOMEBREW_ECMWF_BITBUCKET_TOKEN"]
     if bb_token
       private_bitbucket.each do |name, bb_path|
         ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://#{bb_token}@git.ecmwf.int/scm/#{bb_path}.git"
@@ -91,7 +90,7 @@ class EcmwfToolbox < Formula
     end
 
     # With GitHub token: use authenticated HTTPS for private GitHub projects
-    gh_token = ENV["ECMWF_TOOLBOX_TOKEN"]
+    gh_token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]
     if gh_token
       private_github.each do |name, gh_repo|
         ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://#{gh_token}@github.com/#{gh_repo}.git"
