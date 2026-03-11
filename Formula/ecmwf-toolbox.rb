@@ -1,28 +1,17 @@
-class TokenAuthGitDownloadStrategy < GitDownloadStrategy
+class GitHubPrivateDownloadStrategy < CurlDownloadStrategy
   def initialize(url, name, version, **meta)
     token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]
-    authed_url = token ? url.sub("https://github.com/", "https://x-access-token:#{token}@github.com/") : url
-    $stderr.puts "[TokenAuthGitDownloadStrategy] token_present=#{!token.nil?} url_rewritten=#{url != authed_url}"
-    super(authed_url, name, version, **meta)
-  end
-
-  def env
-    {
-      "GIT_TERMINAL_PROMPT" => "0",
-      "GIT_CONFIG_COUNT"    => "1",
-      "GIT_CONFIG_KEY_0"    => "credential.helper",
-      "GIT_CONFIG_VALUE_0"  => "",
-    }
+    meta[:headers] = ["Authorization: token #{token}"] if token
+    super
   end
 end
 
 class EcmwfToolbox < Formula
   desc "ECMWF software bundle: ecCodes, Magics, Metview, Atlas, and more"
   homepage "https://github.com/recmanj/ecmwf-toolbox"
-  url "https://github.com/recmanj/ecmwf-toolbox.git",
-      tag:      "2026.01.0.0",
-      revision: "bbbf647ae3c43326de15781d033c547b75bee8f4",
-      using:    TokenAuthGitDownloadStrategy
+  url "https://github.com/recmanj/ecmwf-toolbox/archive/refs/tags/2026.01.0.0.tar.gz",
+      using: GitHubPrivateDownloadStrategy
+  sha256 "fe8b131c76b2b78c34f04a275a1e16d2b1ef29fa7c245a549ab45c5a5bc0aa9b"
   license "Apache-2.0"
 
   livecheck do
