@@ -40,54 +40,17 @@ class EcmwfToolbox < Formula
   end
 
   def install
-    # Projects on ECMWF Bitbucket that have public GitHub mirrors
-    github_mirrors = {
-      "ECKIT"  => "ecmwf/eckit",
-      "ODC"    => "ecmwf/odc",
-      "METKIT" => "ecmwf/metkit",
-      "MAGICS" => "ecmwf/magics",
-      "FDB5"   => "ecmwf/fdb",
-    }
-
-    # Private GitHub repos (need HOMEBREW_ECMWF_TOOLBOX_TOKEN)
-    private_github = {
-      "MARS_CLIENT" => "ecmwf/mars-client",
-      "METVIEW"     => "ecmwf/metview",
-    }
-
-    # Private Bitbucket repos (need HOMEBREW_ECMWF_BITBUCKET_TOKEN)
-    private_bitbucket = {
-      "ODB"       => "odb/odb",
-      "ODB_TOOLS" => "odb/odb-tools",
-    }
-
-    # Redirect mirrored Bitbucket projects to GitHub HTTPS (always works)
-    github_mirrors.each do |name, gh_repo|
-      ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://github.com/#{gh_repo}.git"
-    end
-
-    # With Bitbucket token: use authenticated HTTPS for Bitbucket-only projects
-    bb_token = ENV["HOMEBREW_ECMWF_BITBUCKET_TOKEN"]
-    if bb_token
-      private_bitbucket.each do |name, bb_path|
-        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://x-token-auth::#{bb_token}@git.ecmwf.int/scm/#{bb_path}.git"
-      end
-    else
-      private_bitbucket.each_key do |name|
-        ENV["ECMWF_TOOLBOX_SKIP_#{name}"] = "1" unless ENV["ECMWF_TOOLBOX_SKIP_#{name}"]
-      end
-    end
-
-    # With GitHub token: use authenticated HTTPS for private GitHub projects
+    # Write git credentials so ecbundle can clone private repos
     gh_token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]
-    if gh_token
-      private_github.each do |name, gh_repo|
-        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://x-access-token:#{gh_token}@github.com/#{gh_repo}.git"
-      end
-    else
-      private_github.each_key do |name|
-        ENV["ECMWF_TOOLBOX_SKIP_#{name}"] = "1" unless ENV["ECMWF_TOOLBOX_SKIP_#{name}"]
-      end
+    bb_token = ENV["HOMEBREW_ECMWF_BITBUCKET_TOKEN"]
+
+    creds = []
+    creds << "https://x-access-token:#{gh_token}@github.com" if gh_token
+    creds << "https://x-token-auth::#{bb_token}@git.ecmwf.int" if bb_token
+
+    unless creds.empty?
+      (Pathname.new(Dir.home) / ".git-credentials").write(creds.join("\n") + "\n")
+      system "git", "config", "--global", "credential.helper", "store"
     end
 
     # On Linux, Homebrew uses clang which needs explicit OpenMP include/lib paths
