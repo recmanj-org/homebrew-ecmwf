@@ -47,7 +47,9 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && github.triggering_actor != 'github-actions[bot]' }}
     env:
       ECMWF_TOOLBOX_TOKEN: ${{ secrets.ECMWF_TOOLBOX_TOKEN }}
-      GIT_TERMINAL_PROMPT: "0"
+      GIT_TERMINAL_PROMPT: 0
+      HOMEBREW_DEVELOPER: 1
+      HOMEBREW_NO_INSTALL_FROM_API: 1
     strategy:
       matrix:
         runner:
