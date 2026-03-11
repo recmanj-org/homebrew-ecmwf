@@ -9,9 +9,9 @@ class TokenAuthGitDownloadStrategy < GitDownloadStrategy
   def env
     {
       "GIT_TERMINAL_PROMPT" => "0",
-      "GIT_CONFIG_COUNT" => "1",
-      "GIT_CONFIG_KEY_0" => "credential.helper",
-      "GIT_CONFIG_VALUE_0" => "",
+      "GIT_CONFIG_COUNT"    => "1",
+      "GIT_CONFIG_KEY_0"    => "credential.helper",
+      "GIT_CONFIG_VALUE_0"  => "",
     }
   end
 end
