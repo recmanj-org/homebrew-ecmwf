@@ -27,10 +27,23 @@ class GitHubPrivateDownloadStrategy < GitHubGitDownloadStrategy
     # macOS git defaults to the osxkeychain credential helper, which can prompt
     # for keychain access (or block on a GUI dialog) in CI environments. Disable
     # all prompting so git fails fast rather than hanging forever.
+    #
+    # Save and restore GIT_CONFIG_* so they don't leak into the formula build:
+    # leaving GIT_CONFIG_COUNT=1 without its KEY/VALUE pair causes git to abort
+    # with "missing config key GIT_CONFIG_KEY_0" for every subsequent git clone.
     ENV["GIT_TERMINAL_PROMPT"] = "0"
-    ENV["GIT_CONFIG_COUNT"] = "1"
-    ENV["GIT_CONFIG_KEY_0"] = "credential.helper"
+    old_count = ENV["GIT_CONFIG_COUNT"]
+    old_key   = ENV["GIT_CONFIG_KEY_0"]
+    old_value = ENV["GIT_CONFIG_VALUE_0"]
+    ENV["GIT_CONFIG_COUNT"]   = "1"
+    ENV["GIT_CONFIG_KEY_0"]   = "credential.helper"
     ENV["GIT_CONFIG_VALUE_0"] = ""
-    super
+    begin
+      super
+    ensure
+      ENV["GIT_CONFIG_COUNT"]   = old_count  # nil deletes the var
+      ENV["GIT_CONFIG_KEY_0"]   = old_key
+      ENV["GIT_CONFIG_VALUE_0"] = old_value
+    end
   end
 end

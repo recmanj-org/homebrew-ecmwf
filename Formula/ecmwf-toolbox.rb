@@ -70,7 +70,7 @@ class EcmwfToolbox < Formula
     bb_token = ENV["HOMEBREW_ECMWF_BITBUCKET_TOKEN"]
     if bb_token
       private_bitbucket.each do |name, bb_path|
-        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://#{bb_token}@git.ecmwf.int/scm/#{bb_path}.git"
+        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://x-token-auth::#{bb_token}@git.ecmwf.int/scm/#{bb_path}.git"
       end
     else
       private_bitbucket.each_key do |name|
@@ -82,7 +82,7 @@ class EcmwfToolbox < Formula
     gh_token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]
     if gh_token
       private_github.each do |name, gh_repo|
-        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://#{gh_token}@github.com/#{gh_repo}.git"
+        ENV["ECMWF_TOOLBOX_#{name}_GIT"] = "https://x-access-token:#{gh_token}@github.com/#{gh_repo}.git"
       end
     else
       private_github.each_key do |name|
