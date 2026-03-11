@@ -83,6 +83,12 @@ jobs:
 
       - run: brew test-bot --only-setup
 
+      - name: Configure git credentials for private repos
+        if: env.HOMEBREW_ECMWF_TOOLBOX_TOKEN != ''
+        run: |
+          git config --global credential.helper store
+          printf 'https://x-access-token:%s@github.com\n' "$HOMEBREW_ECMWF_TOOLBOX_TOKEN" > ~/.git-credentials
+
       - name: Build bottles
         run: brew test-bot --only-formulae --fail-fast --verbose
 
