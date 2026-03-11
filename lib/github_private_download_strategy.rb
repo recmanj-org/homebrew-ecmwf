@@ -32,17 +32,17 @@ class GitHubPrivateDownloadStrategy < GitHubGitDownloadStrategy
     # leaving GIT_CONFIG_COUNT=1 without its KEY/VALUE pair causes git to abort
     # with "missing config key GIT_CONFIG_KEY_0" for every subsequent git clone.
     ENV["GIT_TERMINAL_PROMPT"] = "0"
-    old_count = ENV["GIT_CONFIG_COUNT"]
-    old_key   = ENV["GIT_CONFIG_KEY_0"]
-    old_value = ENV["GIT_CONFIG_VALUE_0"]
-    ENV["GIT_CONFIG_COUNT"]   = "1"
-    ENV["GIT_CONFIG_KEY_0"]   = "credential.helper"
+    old_count = ENV.fetch("GIT_CONFIG_COUNT", nil)
+    old_key = ENV.fetch("GIT_CONFIG_KEY_0", nil)
+    old_value = ENV.fetch("GIT_CONFIG_VALUE_0", nil)
+    ENV["GIT_CONFIG_COUNT"] = "1"
+    ENV["GIT_CONFIG_KEY_0"] = "credential.helper"
     ENV["GIT_CONFIG_VALUE_0"] = ""
     begin
       super
     ensure
-      ENV["GIT_CONFIG_COUNT"]   = old_count  # nil deletes the var
-      ENV["GIT_CONFIG_KEY_0"]   = old_key
+      ENV["GIT_CONFIG_COUNT"] = old_count # nil deletes the var
+      ENV["GIT_CONFIG_KEY_0"] = old_key
       ENV["GIT_CONFIG_VALUE_0"] = old_value
     end
   end
