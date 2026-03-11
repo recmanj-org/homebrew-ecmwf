@@ -40,13 +40,15 @@ class EcmwfToolbox < Formula
   end
 
   def install
+    ENV.append("GIT_TERMINAL_PROMPT", "0")
+    ENV.append("BITBUCKET", "https://git.ecmwf.int")
     # Write git credentials so ecbundle can clone private repos
     gh_token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]
     bb_token = ENV["HOMEBREW_ECMWF_BITBUCKET_TOKEN"]
 
     creds = []
     creds << "https://x-access-token:#{gh_token}@github.com" if gh_token
-    creds << "https://x-token-auth::#{bb_token}@git.ecmwf.int" if bb_token
+    creds << "https://x-token-auth:#{bb_token}@git.ecmwf.int" if bb_token
 
     unless creds.empty?
       (Pathname.new(Dir.home) / ".git-credentials").write(creds.join("\n") + "\n")
