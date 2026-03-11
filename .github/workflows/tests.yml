@@ -84,7 +84,7 @@ jobs:
       - run: brew test-bot --only-setup
 
       - name: Build bottles
-        run: brew test-bot --only-formulae --fail-fast --verbose --skip-online-checks
+        run: brew test-bot --only-formulae --fail-fast --verbose --skip-online-checks --skip-new
 
       - name: Upload bottles as artifact
         if: always()
