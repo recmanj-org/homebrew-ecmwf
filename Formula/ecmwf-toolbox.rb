@@ -33,11 +33,6 @@ class EcmwfToolbox < Formula
       using: GitHubPrivateDownloadStrategy
   license "Apache-2.0"
 
-  livecheck do
-    url "https://github.com/recmanj/ecmwf-toolbox/tags"
-    regex(/^v?(\d(?:\.\d+)+)$/i)
-  end
-
   depends_on "cmake" => :build
   depends_on "ecbundle" => :build
   depends_on "pkg-config" => :build
