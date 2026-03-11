@@ -92,6 +92,12 @@ class EcmwfToolbox < Formula
       end
     end
 
+    # On Linux, Homebrew uses clang which needs explicit OpenMP include/lib paths
+    unless OS.mac?
+      ENV.append "CPPFLAGS", "-I#{Formula["libomp"].opt_include}"
+      ENV.append "LDFLAGS", "-L#{Formula["libomp"].opt_lib}"
+    end
+
     # ecbundle create: downloads all git repos + generates CMakeLists.txt
     system "ecbundle", "create", "--bundle", buildpath.to_s
 
