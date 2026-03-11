@@ -1,31 +1,25 @@
 require "download_strategy"
 
-class GitHubPrivateDownloadStrategy < CurlDownloadStrategy
-  GITHUB_ARCHIVE_URL_REGEX = %r{
+class GitHubPrivateDownloadStrategy < GitHubGitDownloadStrategy
+  GITHUB_REPO_URL_REGEX = %r{
     \Ahttps://github\.com/
     (?<owner>[^/]+)/
-    (?<repo>[^/]+)/
-    archive/refs/tags/
-    (?<tag>.+)\.tar\.gz
+    (?<repo>[^/]+)\.git
     \z
   }x
 
   def initialize(url, name, version, **meta)
-    match = url.match(GITHUB_ARCHIVE_URL_REGEX)
-    raise "Unsupported GitHub archive URL: #{url}" unless match
+    match = url.match(GITHUB_REPO_URL_REGEX)
+    raise "Unsupported GitHub repository URL: #{url}" unless match
 
     @token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"].to_s
     @original_url = url
-    api_url = "https://api.github.com/repos/#{match[:owner]}/#{match[:repo]}/tarball/#{match[:tag]}"
-    super(api_url, name, version, **meta)
+    super(url, name, version, **meta)
+    @url = "https://x-access-token:#{@token}@github.com/#{match[:owner]}/#{match[:repo]}.git" unless @token.empty?
   end
 
   def fetch(timeout: nil)
     raise "HOMEBREW_ECMWF_TOOLBOX_TOKEN is required to download #{@original_url}" if @token.empty?
-
-    meta[:headers] = Array(meta[:headers])
-    auth_header = "Authorization: token #{@token}"
-    meta[:headers] << auth_header unless meta[:headers].include?(auth_header)
     super
   end
 end
@@ -33,9 +27,9 @@ end
 class EcmwfToolbox < Formula
   desc "ECMWF software bundle: ecCodes, Magics, Metview, Atlas, and more"
   homepage "https://github.com/recmanj/ecmwf-toolbox"
-  url "https://github.com/recmanj/ecmwf-toolbox/archive/refs/tags/2026.01.0.0.tar.gz",
+  url "https://github.com/recmanj/ecmwf-toolbox.git",
+      tag: "2026.01.0.0",
       using: GitHubPrivateDownloadStrategy
-  sha256 "b7a4ce8ce09f4a39b357853b35d95e9b6d42f94a1442abf10e4d32f5a7b2991e"
   license "Apache-2.0"
 
   livecheck do
