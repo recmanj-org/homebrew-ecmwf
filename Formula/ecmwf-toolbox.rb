@@ -1,9 +1,20 @@
+class TokenAuthGitDownloadStrategy < GitDownloadStrategy
+  def initialize(url, name, version, **meta)
+    token = ENV["ECMWF_TOOLBOX_TOKEN"]
+    if token
+      url = url.sub("https://github.com/", "https://x-access-token:#{token}@github.com/")
+    end
+    super(url, name, version, **meta)
+  end
+end
+
 class EcmwfToolbox < Formula
   desc "ECMWF software bundle: ecCodes, Magics, Metview, Atlas, and more"
   homepage "https://github.com/recmanj/ecmwf-toolbox"
   url "https://github.com/recmanj/ecmwf-toolbox.git",
       tag:      "2026.01.0.0",
-      revision: "bbbf647ae3c43326de15781d033c547b75bee8f4"
+      revision: "bbbf647ae3c43326de15781d033c547b75bee8f4",
+      using:    TokenAuthGitDownloadStrategy
   license "Apache-2.0"
 
   livecheck do
