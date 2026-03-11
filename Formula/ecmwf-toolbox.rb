@@ -1,8 +1,8 @@
 class TokenAuthGitDownloadStrategy < GitDownloadStrategy
   def initialize(url, name, version, **meta)
     token = ENV["ECMWF_TOOLBOX_TOKEN"]
-    url = url.sub("https://github.com/", "https://x-access-token:#{token}@github.com/") if token
-    super(url, name, version, **meta) # rubocop:disable Style/SuperArguments
+    authed_url = token ? url.sub("https://github.com/", "https://x-access-token:#{token}@github.com/") : url
+    super(authed_url, name, version, **meta)
   end
 end
 
