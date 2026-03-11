@@ -123,6 +123,7 @@ class EcmwfToolbox < Formula
 
     # Remove build log that contains shim references
     rm_f pkgshare/"build.log"
+  end
 
   test do
     system bin/"codes_info"
