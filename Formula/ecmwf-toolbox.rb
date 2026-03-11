@@ -5,6 +5,10 @@ class TokenAuthGitDownloadStrategy < GitDownloadStrategy
     $stderr.puts "[TokenAuthGitDownloadStrategy] token_present=#{!token.nil?} url_rewritten=#{url != authed_url}"
     super(authed_url, name, version, **meta)
   end
+
+  def env
+    { "GIT_TERMINAL_PROMPT" => "0" }
+  end
 end
 
 class EcmwfToolbox < Formula
