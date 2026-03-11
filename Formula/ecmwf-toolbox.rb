@@ -1,7 +1,7 @@
 class EcmwfToolbox < Formula
   desc "ECMWF software bundle: ecCodes, Magics, Metview, Atlas, and more"
   homepage "https://github.com/recmanj/ecmwf-toolbox"
-  url "https://github.com/recmanj/ecmwf-toolbox/archive/refs/tags/2026.01.0.0.tar.gz", headers: ["Authorization: token #{ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]}"]
+  url "https://api.github.com/repos/recmanj/ecmwf-toolbox/tarball/2026.01.0.0", headers: ["Authorization: token #{ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]}"]
   sha256 "fe8b131c76b2b78c34f04a275a1e16d2b1ef29fa7c245a549ab45c5a5bc0aa9b"
   license "Apache-2.0"
 
