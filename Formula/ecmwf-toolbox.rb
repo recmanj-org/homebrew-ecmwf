@@ -115,6 +115,7 @@ class EcmwfToolbox < Formula
            "--cmake", "ENABLE_PNG=ON",
            "--cmake", "ENABLE_FDB5=ON",
            "--cmake", "ENABLE_CLANG_TIDY=OFF",
+           "--cmake", "CMAKE_CXX_CLANG_TIDY=",
            "--cmake", "INSTALL_LIB_DIR=lib",
            "--cmake", "CMAKE_PREFIX_PATH=#{ENV["CMAKE_PREFIX_PATH"]}",
            "--cmake", "OpenMP_ROOT=#{Formula["libomp"].opt_prefix}",
