@@ -2,6 +2,7 @@ class TokenAuthGitDownloadStrategy < GitDownloadStrategy
   def initialize(url, name, version, **meta)
     token = ENV["HOMEBREW_ECMWF_TOOLBOX_TOKEN"]
     authed_url = token ? url.sub("https://github.com/", "https://x-access-token:#{token}@github.com/") : url
+    $stderr.puts "[TokenAuthGitDownloadStrategy] token_present=#{!token.nil?} url_rewritten=#{url != authed_url}"
     super(authed_url, name, version, **meta)
   end
 end
