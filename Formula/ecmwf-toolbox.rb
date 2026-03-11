@@ -1,10 +1,8 @@
 class TokenAuthGitDownloadStrategy < GitDownloadStrategy
   def initialize(url, name, version, **meta)
     token = ENV["ECMWF_TOOLBOX_TOKEN"]
-    if token
-      url = url.sub("https://github.com/", "https://x-access-token:#{token}@github.com/")
-    end
-    super(url, name, version, **meta)
+    url = url.sub("https://github.com/", "https://x-access-token:#{token}@github.com/") if token
+    super
   end
 end
 
