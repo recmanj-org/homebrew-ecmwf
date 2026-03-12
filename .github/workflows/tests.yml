@@ -5,6 +5,11 @@ on:
     branches:
       - master
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
 
 permissions:
   actions: read
@@ -29,8 +34,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ steps.set-up-homebrew.outputs.gems-path }}
-          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
-          restore-keys: ${{ runner.os }}-rubygems-
+          key: ${{ runner.os }}-${{ runner.arch }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-rubygems-
 
       - name: Install Homebrew Bundler RubyGems
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
@@ -44,10 +49,11 @@ jobs:
 
   test-bot:
     needs: syntax
-    if: ${{ github.event_name == 'pull_request' && github.triggering_actor != 'github-actions[bot]' }}
+    if: ${{ github.event_name == 'pull_request' && github.triggering_actor != 'github-actions[bot]' && (github.event.pull_request.head.repo.fork == false || contains(github.event.pull_request.labels.*.name, 'approved-for-ci')) }}
     env:
-      HOMEBREW_ECMWF_TOOLBOX_TOKEN: ${{ secrets.ECMWF_TOOLBOX_TOKEN }}
-      HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
+      HOMEBREW_GH_REPO_READ_TOKEN: ${{ secrets.GH_REPO_READ_TOKEN }}
+      HOMEBREW_BITBUCKET_PAT: ${{ secrets.BITBUCKET_PAT }}
+      HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
       GIT_TERMINAL_PROMPT: 0
       HOMEBREW_DEVELOPER: 1
       HOMEBREW_NO_INSTALL_FROM_API: 1
@@ -55,12 +61,12 @@ jobs:
       matrix:
         runner:
           - ubuntu-24.04
+          - ubuntu-24.04-arm
           - macos-14
           - macos-15
-          - macos-15-intel
           - macos-26
+          - macos-15-intel
           - macos-26-intel
-          - ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Set up Homebrew
@@ -72,8 +78,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ steps.set-up-homebrew.outputs.gems-path }}
-          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
-          restore-keys: ${{ runner.os }}-rubygems-
+          key: ${{ runner.os }}-${{ runner.arch }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-rubygems-
 
       - name: Install Homebrew Bundler RubyGems
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
@@ -84,7 +90,29 @@ jobs:
       - run: brew test-bot --only-setup
 
       - name: Build bottles
-        run: brew test-bot --only-formulae --fail-fast --verbose --skip-online-checks --skip-new
+        env:
+          HOMEBREW_ECMWF_BUILD_LOG: ${{ runner.temp }}/ecmwf-toolbox-build.log
+        run: >
+          brew test-bot --only-formulae --fail-fast --skip-online-checks --skip-new
+          --root-url https://get-test.ecmwf.int/repository/homebrew
+
+      - name: Upload ecmwf-toolbox build log to Nexus
+        if: always()
+        run: |
+          LOG_FILE="${{ runner.temp }}/ecmwf-toolbox-build.log"
+          if [ -f "$LOG_FILE" ]; then
+            LOG_NAME="build-${{ github.run_id }}-${{ matrix.runner }}.log"
+            response=$(curl -sf -w "%{http_code}" \
+              --user "${{ secrets.NEXUS_PUBLIC_TEST_REPO_UPLOAD_TOKEN }}" \
+              --upload-file "$LOG_FILE" \
+              "https://get-test.ecmwf.int/repository/homebrew/build-logs/${{ github.run_id }}/$LOG_NAME")
+            status=$(echo "$response" | tail -c 4)
+            if [ "$status" -eq 201 ] || [ "$status" -eq 200 ]; then
+              echo "Build log uploaded: logs/$LOG_NAME"
+            else
+              echo "Warning: Failed to upload build log (HTTP $status)"
+            fi
+          fi
 
       - name: Upload bottles as artifact
         if: always()
