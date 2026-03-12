@@ -101,6 +101,7 @@ jobs:
         run: |
           LOG_FILE="/tmp/ecmwf-toolbox-build.log"
           if [ -f "$LOG_FILE" ]; then
+            cat "$LOG_FILE"
             LOG_NAME="build-${{ github.run_id }}-${{ matrix.runner }}.log"
             response=$(curl -sf -w "%{http_code}" \
               --user "${{ secrets.NEXUS_PUBLIC_TEST_REPO_UPLOAD_TOKEN }}" \
