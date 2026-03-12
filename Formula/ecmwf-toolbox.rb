@@ -6,7 +6,7 @@ class EcmwfToolbox < Formula
   url "https://github.com/recmanj/ecmwf-toolbox.git",
       tag:       "2026.01.0.0",
       using:     GitHubPrivateDownloadStrategy,
-      token_env: "HOMEBREW_HOMEBREW_GH_REPO_READ_TOKEN"
+      token_env: "HOMEBREW_GH_REPO_READ_TOKEN"
   license "Apache-2.0"
 
   depends_on "cmake" => :build
@@ -44,8 +44,8 @@ class EcmwfToolbox < Formula
     ENV.append("BITBUCKET", "https://git.ecmwf.int")
 
     # Write git credentials so ecbundle can clone private repos
-    gh_token = ENV["HOMEBREW_HOMEBREW_GH_REPO_READ_TOKEN"]
-    bb_token = ENV["HOMEBREW_HOMEBREW_BITBUCKET_PAT"]
+    gh_token = ENV["HOMEBREW_GH_REPO_READ_TOKEN"]
+    bb_token = ENV["HOMEBREW_BITBUCKET_PAT"]
     secrets = [gh_token, bb_token].compact.reject(&:empty?)
 
     creds = []
@@ -75,7 +75,7 @@ class EcmwfToolbox < Formula
     # In CI, capture build output to a log file, or suppress it as a precaution.
     # Locally, stream sanitized output to stdout.
     ci = ENV["CI"]
-    build_log_path = ENV["HOMEBREW_HOMEBREW_ECMWF_BUILD_LOG"]
+    build_log_path = ENV["HOMEBREW_ECMWF_BUILD_LOG"]
 
     run_build = lambda do |output_io|
       # ecbundle create: downloads all git repos + generates CMakeLists.txt
