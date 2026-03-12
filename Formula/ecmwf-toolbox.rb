@@ -72,10 +72,10 @@ class EcmwfToolbox < Formula
       ENV.prepend_path "PATH", buildpath/"bin"
     end
 
-    # In CI, capture build output to a log file, or suppress it as a precaution.
-    # Locally, stream sanitized output to stdout.
+    # In CI, capture build output to a log file inside the sandbox-safe buildpath,
+    # then copy it to prefix for CI to retrieve. Locally, stream sanitized output
+    # to stdout.
     ci = ENV["CI"]
-    build_log_path = ENV["HOMEBREW_ECMWF_BUILD_LOG"]
 
     run_build = lambda do |output_io|
       # ecbundle create: downloads all git repos + generates CMakeLists.txt
@@ -103,10 +103,10 @@ class EcmwfToolbox < Formula
                     "-j#{ENV.make_jobs}")
     end
 
-    if ci && build_log_path
-      File.open(build_log_path, "w") { |f| run_build.call(f) }
-    elsif ci
-      File.open(File::NULL, "w") { |f| run_build.call(f) }
+    if ci
+      build_log = buildpath/"ecmwf-toolbox-build.log"
+      File.open(build_log, "w") { |f| run_build.call(f) }
+      cp build_log, prefix/"ecmwf-toolbox-build.log" if build_log.exist?
     else
       run_build.call($stdout)
     end
